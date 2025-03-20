@@ -1,5 +1,3 @@
-
-
 # Code Review Agent System
 
 The Code Review Agent System is an intelligent, automated solution designed to streamline the code review process. This system leverages AI agents to analyze code, provide insightful feedback, and facilitate collaboration between developers.
@@ -32,12 +30,12 @@ flowchart TD
 			a1["Agent"] --Query--> ta1-l1["Query MR"]
 			a1 --"Comment"--> ta1-l2["Comment MR"]
     end
-    subgraph sa2[Agent R and D]
+    subgraph sa2[Knowledge Agent]
       a2["Agent"] --Query--> ta2-l1["Git"]
       a2 --Query--> ta2-l2["RAG"]
     end
 
-    subgraph sa3[Agent Review Code]
+    subgraph sa3[Review Code Agent]
       a3["Agent"] --Analyze--> ta3-l1["Code Analysis"]
       a3 --Generate--> ta3-l2["Review Comments"]
     end
@@ -68,7 +66,7 @@ sequenceDiagram
     participant User
     participant SA as Supervisor Agent
     participant GH as GitHub Agent
-    participant RD as R&D Agent
+    participant RD as Knowledge Agent
     participant CR as Code Review Agent
 
     User->>SA: Submit Code Review Request
