@@ -30,6 +30,10 @@ flowchart TD
 			a1["Agent"] --Query--> ta1-l1["Query MR"]
 			a1 --"Comment"--> ta1-l2["Comment MR"]
     end
+
+    subgraph aa1[Analytics Agent]
+    end
+
     subgraph sa2[Knowledge Agent]
       a2["Agent"] --Query--> ta2-l1["Git"]
       a2 --Query--> ta2-l2["RAG"]
@@ -41,6 +45,7 @@ flowchart TD
     end
 
 		sa1 --> sa2
+		sa1 --> aa1
 		sa1 --> gh1
 		sa1 --> sa3
 
@@ -66,40 +71,43 @@ sequenceDiagram
     participant User
     participant SA as Supervisor Agent
     participant GH as GitHub Agent
+    participant CA as Code Analysis Agent
     participant RD as Knowledge Agent
     participant CR as Code Review Agent
-
     User->>SA: Submit Code Review Request
     
     %% Step 1: Initial Processing
     SA->>GH: Request MR Details
     GH-->>SA: Return MR Information
     
-    %% Step 2: Parallel Processing
-    par Parallel Analysis
-        SA->>RD: Request Historical Context
-        SA->>CR: Request Code Analysis
-    end
+    %% Step 2: Code Analysis Agent Processing
+    SA->>CA: Request Code Analysis
+    CA->>CA: Analyze Repository MR
+    CA->>CA: Determine Language Distribution
+    CA-->>SA: Return Language Stats & Metrics
     
-    %% Step 3: R&D Agent Processing
+    
+    %% Step 4: R&D Agent Processing
+		SA->>RD: Request Historical Context
     RD->>RD: Query Git Repository
     RD->>RD: Process RAG Data
-    RD-->>SA: Return Context & Patterns
+    RD->>RD: Retrieve Coding Standards
+    RD-->>SA: Return Context, Patterns & Standard Code
     
-    %% Step 4: Code Review Processing
+    %% Step 5: Code Review Processing
+    SA->>CR: Request Code Review
     CR->>CR: Analyze Code
     CR->>CR: Check Standards
-    CR->>CR: Identify Issues
     CR-->>SA: Return Review Results
     
-    %% Step 5: Consolidation
+    %% Step 6: Consolidation
     SA->>SA: Consolidate Feedback
     
-    %% Step 6: Posting Results
+    %% Step 7: Posting Results
     SA->>GH: Post Review Comments
     GH->>GH: Update MR
     
-    %% Step 7: Final Response
+    %% Step 8: Final Response
     SA-->>User: Provide Review Summary
 ```
 
