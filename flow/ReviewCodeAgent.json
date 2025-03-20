@@ -1,0 +1,3159 @@
+{
+  "webhook": false,
+  "icon": null,
+  "name": "ReviewCodeAgent",
+  "description": "Conversational Cartography Unlocked.",
+  "icon_bg_color": null,
+  "endpoint_name": null,
+  "user_id": "150c9fc9-abdd-44d4-aa97-7e70705db69a",
+  "id": "6f9ca321-038d-4ef5-b284-716dc628d817",
+  "tags": null,
+  "gradient": null,
+  "locked": false,
+  "folder_id": "c9cc899e-c16a-4e2a-8552-b9fc22d8729a",
+  "is_component": false,
+  "data": {
+    "nodes": [
+      {
+        "id": "Confluence-qC2x5",
+        "type": "genericNode",
+        "position": {
+          "x": 3699.13098159633,
+          "y": 901.8244962763173
+        },
+        "data": {
+          "type": "Confluence",
+          "node": {
+            "template": {
+              "_type": "Component",
+              "api_key": {
+                "load_from_db": false,
+                "required": true,
+                "placeholder": "",
+                "show": true,
+                "name": "api_key",
+                "value": "",
+                "display_name": "API Key",
+                "advanced": false,
+                "input_types": [
+                  "Message"
+                ],
+                "dynamic": false,
+                "info": "Atlassian Key. Create at: https://id.atlassian.com/manage-profile/security/api-tokens",
+                "title_case": false,
+                "password": true,
+                "type": "str",
+                "_input_type": "SecretStrInput"
+              },
+              "cloud": {
+                "tool_mode": false,
+                "trace_as_metadata": true,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": true,
+                "placeholder": "",
+                "show": true,
+                "name": "cloud",
+                "value": true,
+                "display_name": "Use Cloud?",
+                "advanced": true,
+                "dynamic": false,
+                "info": "",
+                "title_case": false,
+                "type": "bool",
+                "_input_type": "BoolInput"
+              },
+              "code": {
+                "type": "code",
+                "required": true,
+                "placeholder": "",
+                "list": false,
+                "show": true,
+                "multiline": true,
+                "value": "from langchain_community.document_loaders import ConfluenceLoader\nfrom langchain_community.document_loaders.confluence import ContentFormat\n\nfrom langflow.custom import Component\nfrom langflow.io import BoolInput, DropdownInput, IntInput, Output, SecretStrInput, StrInput\nfrom langflow.schema import Data\n\n\nclass ConfluenceComponent(Component):\n    display_name = \"Confluence\"\n    description = \"Confluence wiki collaboration platform\"\n    documentation = \"https://python.langchain.com/v0.2/docs/integrations/document_loaders/confluence/\"\n    trace_type = \"tool\"\n    icon = \"Confluence\"\n    name = \"Confluence\"\n\n    inputs = [\n        StrInput(\n            name=\"url\",\n            display_name=\"Site URL\",\n            required=True,\n            info=\"The base URL of the Confluence Space. Example: https://<company>.atlassian.net/wiki.\",\n        ),\n        StrInput(\n            name=\"username\",\n            display_name=\"Username\",\n            required=True,\n            info=\"Atlassian User E-mail. Example: email@example.com\",\n        ),\n        SecretStrInput(\n            name=\"api_key\",\n            display_name=\"API Key\",\n            required=True,\n            info=\"Atlassian Key. Create at: https://id.atlassian.com/manage-profile/security/api-tokens\",\n        ),\n        StrInput(name=\"space_key\", display_name=\"Space Key\", required=True),\n        BoolInput(name=\"cloud\", display_name=\"Use Cloud?\", required=True, value=True, advanced=True),\n        DropdownInput(\n            name=\"content_format\",\n            display_name=\"Content Format\",\n            options=[\n                ContentFormat.EDITOR.value,\n                ContentFormat.EXPORT_VIEW.value,\n                ContentFormat.ANONYMOUS_EXPORT_VIEW.value,\n                ContentFormat.STORAGE.value,\n                ContentFormat.VIEW.value,\n            ],\n            value=ContentFormat.STORAGE.value,\n            required=True,\n            advanced=True,\n            info=\"Specify content format, defaults to ContentFormat.STORAGE\",\n        ),\n        IntInput(\n            name=\"max_pages\",\n            display_name=\"Max Pages\",\n            required=False,\n            value=1000,\n            advanced=True,\n            info=\"Maximum number of pages to retrieve in total, defaults 1000\",\n        ),\n    ]\n\n    outputs = [\n        Output(name=\"data\", display_name=\"Data\", method=\"load_documents\"),\n    ]\n\n    def build_confluence(self) -> ConfluenceLoader:\n        content_format = ContentFormat(self.content_format)\n        return ConfluenceLoader(\n            url=self.url,\n            username=self.username,\n            api_key=self.api_key,\n            cloud=self.cloud,\n            space_key=self.space_key,\n            content_format=content_format,\n            max_pages=self.max_pages,\n        )\n\n    def load_documents(self) -> list[Data]:\n        confluence = self.build_confluence()\n        documents = confluence.load()\n        data = [Data.from_document(doc) for doc in documents]  # Using the from_document method of Data\n        self.status = data\n        return data\n",
+                "fileTypes": [],
+                "file_path": "",
+                "password": false,
+                "name": "code",
+                "advanced": true,
+                "dynamic": true,
+                "info": "",
+                "load_from_db": false,
+                "title_case": false
+              },
+              "content_format": {
+                "tool_mode": false,
+                "trace_as_metadata": true,
+                "options": [
+                  "body.editor",
+                  "body.export_view",
+                  "body.anonymous_export_view",
+                  "body.storage",
+                  "body.view"
+                ],
+                "options_metadata": [],
+                "combobox": false,
+                "dialog_inputs": {},
+                "required": true,
+                "placeholder": "",
+                "show": true,
+                "name": "content_format",
+                "value": "body.storage",
+                "display_name": "Content Format",
+                "advanced": true,
+                "dynamic": false,
+                "info": "Specify content format, defaults to ContentFormat.STORAGE",
+                "title_case": false,
+                "type": "str",
+                "_input_type": "DropdownInput"
+              },
+              "max_pages": {
+                "tool_mode": false,
+                "trace_as_metadata": true,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "max_pages",
+                "value": 1000,
+                "display_name": "Max Pages",
+                "advanced": true,
+                "dynamic": false,
+                "info": "Maximum number of pages to retrieve in total, defaults 1000",
+                "title_case": false,
+                "type": "int",
+                "_input_type": "IntInput"
+              },
+              "space_key": {
+                "tool_mode": false,
+                "trace_as_metadata": true,
+                "load_from_db": false,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": true,
+                "placeholder": "",
+                "show": true,
+                "name": "space_key",
+                "value": "~7120207ea0861e4d694abb88fe3632839fc6e9",
+                "display_name": "Space Key",
+                "advanced": false,
+                "dynamic": false,
+                "info": "",
+                "title_case": false,
+                "type": "str",
+                "_input_type": "StrInput"
+              },
+              "url": {
+                "tool_mode": false,
+                "trace_as_metadata": true,
+                "load_from_db": false,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": true,
+                "placeholder": "",
+                "show": true,
+                "name": "url",
+                "value": "https://ktbinnovation.atlassian.net/wik",
+                "display_name": "Site URL",
+                "advanced": false,
+                "dynamic": false,
+                "info": "The base URL of the Confluence Space. Example: https://<company>.atlassian.net/wiki.",
+                "title_case": false,
+                "type": "str",
+                "_input_type": "StrInput"
+              },
+              "username": {
+                "tool_mode": false,
+                "trace_as_metadata": true,
+                "load_from_db": false,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": true,
+                "placeholder": "",
+                "show": true,
+                "name": "username",
+                "value": "chinnawat.p@arise.tech",
+                "display_name": "Username",
+                "advanced": false,
+                "dynamic": false,
+                "info": "Atlassian User E-mail. Example: email@example.com",
+                "title_case": false,
+                "type": "str",
+                "_input_type": "StrInput"
+              }
+            },
+            "description": "Confluence wiki collaboration platform",
+            "icon": "Confluence",
+            "base_classes": [
+              "Data"
+            ],
+            "display_name": "Confluence",
+            "documentation": "https://python.langchain.com/v0.2/docs/integrations/document_loaders/confluence/",
+            "minimized": false,
+            "custom_fields": {},
+            "output_types": [],
+            "pinned": false,
+            "conditional_paths": [],
+            "frozen": false,
+            "outputs": [
+              {
+                "types": [
+                  "Data"
+                ],
+                "selected": "Data",
+                "name": "data",
+                "hidden": null,
+                "display_name": "Data",
+                "method": "load_documents",
+                "value": "__UNDEFINED__",
+                "cache": true,
+                "required_inputs": null,
+                "allows_loop": false,
+                "tool_mode": true
+              }
+            ],
+            "field_order": [
+              "url",
+              "username",
+              "api_key",
+              "space_key",
+              "cloud",
+              "content_format",
+              "max_pages"
+            ],
+            "beta": false,
+            "legacy": false,
+            "edited": false,
+            "metadata": {},
+            "tool_mode": false
+          },
+          "id": "Confluence-qC2x5"
+        },
+        "selected": false,
+        "measured": {
+          "width": 320,
+          "height": 475
+        }
+      },
+      {
+        "id": "SequentialCrewComponent-bnnWr",
+        "type": "genericNode",
+        "position": {
+          "x": 2582.044167257565,
+          "y": 1103.2032033943
+        },
+        "data": {
+          "type": "SequentialCrewComponent",
+          "node": {
+            "template": {
+              "_type": "Component",
+              "function_calling_llm": {
+                "trace_as_metadata": true,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "function_calling_llm",
+                "value": "",
+                "display_name": "Function Calling LLM",
+                "advanced": true,
+                "input_types": [
+                  "LanguageModel"
+                ],
+                "dynamic": false,
+                "info": "Turns the ReAct CrewAI agent into a function-calling agent",
+                "title_case": false,
+                "type": "other",
+                "_input_type": "HandleInput"
+              },
+              "tasks": {
+                "trace_as_metadata": true,
+                "list": true,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "tasks",
+                "value": "",
+                "display_name": "Tasks",
+                "advanced": false,
+                "input_types": [
+                  "SequentialTask"
+                ],
+                "dynamic": false,
+                "info": "",
+                "title_case": false,
+                "type": "other",
+                "_input_type": "HandleInput"
+              },
+              "code": {
+                "type": "code",
+                "required": true,
+                "placeholder": "",
+                "list": false,
+                "show": true,
+                "multiline": true,
+                "value": "from crewai import Agent, Crew, Process, Task\n\nfrom langflow.base.agents.crewai.crew import BaseCrewComponent\nfrom langflow.io import HandleInput\nfrom langflow.schema.message import Message\n\n\nclass SequentialCrewComponent(BaseCrewComponent):\n    display_name: str = \"Sequential Crew\"\n    description: str = \"Represents a group of agents with tasks that are executed sequentially.\"\n    documentation: str = \"https://docs.crewai.com/how-to/Sequential/\"\n    icon = \"CrewAI\"\n\n    inputs = [\n        *BaseCrewComponent._base_inputs,\n        HandleInput(name=\"tasks\", display_name=\"Tasks\", input_types=[\"SequentialTask\"], is_list=True),\n    ]\n\n    @property\n    def agents(self: \"SequentialCrewComponent\") -> list[Agent]:\n        # Derive agents directly from linked tasks\n        return [task.agent for task in self.tasks if hasattr(task, \"agent\")]\n\n    def get_tasks_and_agents(self, agents_list=None) -> tuple[list[Task], list[Agent]]:\n        # Use the agents property to derive agents\n        if not agents_list:\n            existing_agents = self.agents\n            agents_list = existing_agents + (agents_list or [])\n\n        return super().get_tasks_and_agents(agents_list=agents_list)\n\n    def build_crew(self) -> Message:\n        tasks, agents = self.get_tasks_and_agents()\n\n        return Crew(\n            agents=agents,\n            tasks=tasks,\n            process=Process.sequential,\n            verbose=self.verbose,\n            memory=self.memory,\n            cache=self.use_cache,\n            max_rpm=self.max_rpm,\n            share_crew=self.share_crew,\n            function_calling_llm=self.function_calling_llm,\n            step_callback=self.get_step_callback(),\n            task_callback=self.get_task_callback(),\n        )\n",
+                "fileTypes": [],
+                "file_path": "",
+                "password": false,
+                "name": "code",
+                "advanced": true,
+                "dynamic": true,
+                "info": "",
+                "load_from_db": false,
+                "title_case": false
+              },
+              "max_rpm": {
+                "tool_mode": false,
+                "trace_as_metadata": true,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "max_rpm",
+                "value": 100,
+                "display_name": "Max RPM",
+                "advanced": true,
+                "dynamic": false,
+                "info": "",
+                "title_case": false,
+                "type": "int",
+                "_input_type": "IntInput"
+              },
+              "memory": {
+                "tool_mode": false,
+                "trace_as_metadata": true,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "memory",
+                "value": false,
+                "display_name": "Memory",
+                "advanced": true,
+                "dynamic": false,
+                "info": "",
+                "title_case": false,
+                "type": "bool",
+                "_input_type": "BoolInput"
+              },
+              "share_crew": {
+                "tool_mode": false,
+                "trace_as_metadata": true,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "share_crew",
+                "value": false,
+                "display_name": "Share Crew",
+                "advanced": true,
+                "dynamic": false,
+                "info": "",
+                "title_case": false,
+                "type": "bool",
+                "_input_type": "BoolInput"
+              },
+              "use_cache": {
+                "tool_mode": false,
+                "trace_as_metadata": true,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "use_cache",
+                "value": true,
+                "display_name": "Cache",
+                "advanced": true,
+                "dynamic": false,
+                "info": "",
+                "title_case": false,
+                "type": "bool",
+                "_input_type": "BoolInput"
+              },
+              "verbose": {
+                "tool_mode": false,
+                "trace_as_metadata": true,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "verbose",
+                "value": 0,
+                "display_name": "Verbose",
+                "advanced": true,
+                "dynamic": false,
+                "info": "",
+                "title_case": false,
+                "type": "int",
+                "_input_type": "IntInput"
+              }
+            },
+            "description": "Represents a group of agents with tasks that are executed sequentially.",
+            "icon": "CrewAI",
+            "base_classes": [
+              "Message"
+            ],
+            "display_name": "Sequential Crew",
+            "documentation": "https://docs.crewai.com/how-to/Sequential/",
+            "minimized": false,
+            "custom_fields": {},
+            "output_types": [],
+            "pinned": false,
+            "conditional_paths": [],
+            "frozen": false,
+            "outputs": [
+              {
+                "types": [
+                  "Message"
+                ],
+                "selected": "Message",
+                "name": "output",
+                "hidden": null,
+                "display_name": "Output",
+                "method": "build_output",
+                "value": "__UNDEFINED__",
+                "cache": true,
+                "required_inputs": [],
+                "allows_loop": false,
+                "tool_mode": true
+              }
+            ],
+            "field_order": [
+              "verbose",
+              "memory",
+              "use_cache",
+              "max_rpm",
+              "share_crew",
+              "function_calling_llm",
+              "tasks"
+            ],
+            "beta": false,
+            "legacy": false,
+            "edited": false,
+            "metadata": {},
+            "tool_mode": false,
+            "lf_version": "1.2.0"
+          },
+          "id": "SequentialCrewComponent-bnnWr"
+        },
+        "selected": false,
+        "measured": {
+          "width": 320,
+          "height": 211
+        }
+      },
+      {
+        "id": "OllamaModel-rcXS4",
+        "type": "genericNode",
+        "position": {
+          "x": 1424.1664322795596,
+          "y": 1365.822868835206
+        },
+        "data": {
+          "type": "OllamaModel",
+          "node": {
+            "template": {
+              "_type": "Component",
+              "base_url": {
+                "tool_mode": false,
+                "trace_as_input": true,
+                "trace_as_metadata": true,
+                "load_from_db": false,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "base_url",
+                "value": "http://localhost:11434",
+                "display_name": "Base URL",
+                "advanced": false,
+                "input_types": [
+                  "Message"
+                ],
+                "dynamic": false,
+                "info": "Endpoint of the Ollama API.",
+                "title_case": false,
+                "type": "str",
+                "_input_type": "MessageTextInput"
+              },
+              "code": {
+                "type": "code",
+                "required": true,
+                "placeholder": "",
+                "list": false,
+                "show": true,
+                "multiline": true,
+                "value": "from typing import Any\nfrom urllib.parse import urljoin\n\nimport httpx\nfrom langchain_ollama import ChatOllama\n\nfrom langflow.base.models.model import LCModelComponent\nfrom langflow.base.models.ollama_constants import OLLAMA_EMBEDDING_MODELS, OLLAMA_TOOL_MODELS_BASE, URL_LIST\nfrom langflow.field_typing import LanguageModel\nfrom langflow.field_typing.range_spec import RangeSpec\nfrom langflow.io import BoolInput, DictInput, DropdownInput, FloatInput, IntInput, MessageTextInput, SliderInput\n\nHTTP_STATUS_OK = 200\n\n\nclass ChatOllamaComponent(LCModelComponent):\n    display_name = \"Ollama\"\n    description = \"Generate text using Ollama Local LLMs.\"\n    icon = \"Ollama\"\n    name = \"OllamaModel\"\n\n    inputs = [\n        MessageTextInput(\n            name=\"base_url\",\n            display_name=\"Base URL\",\n            info=\"Endpoint of the Ollama API.\",\n            value=\"\",\n        ),\n        DropdownInput(\n            name=\"model_name\",\n            display_name=\"Model Name\",\n            options=[],\n            info=\"Refer to https://ollama.com/library for more models.\",\n            refresh_button=True,\n            real_time_refresh=True,\n        ),\n        SliderInput(\n            name=\"temperature\", display_name=\"Temperature\", value=0.1, range_spec=RangeSpec(min=0, max=1, step=0.01)\n        ),\n        MessageTextInput(\n            name=\"format\", display_name=\"Format\", info=\"Specify the format of the output (e.g., json).\", advanced=True\n        ),\n        DictInput(name=\"metadata\", display_name=\"Metadata\", info=\"Metadata to add to the run trace.\", advanced=True),\n        DropdownInput(\n            name=\"mirostat\",\n            display_name=\"Mirostat\",\n            options=[\"Disabled\", \"Mirostat\", \"Mirostat 2.0\"],\n            info=\"Enable/disable Mirostat sampling for controlling perplexity.\",\n            value=\"Disabled\",\n            advanced=True,\n            real_time_refresh=True,\n        ),\n        FloatInput(\n            name=\"mirostat_eta\",\n            display_name=\"Mirostat Eta\",\n            info=\"Learning rate for Mirostat algorithm. (Default: 0.1)\",\n            advanced=True,\n        ),\n        FloatInput(\n            name=\"mirostat_tau\",\n            display_name=\"Mirostat Tau\",\n            info=\"Controls the balance between coherence and diversity of the output. (Default: 5.0)\",\n            advanced=True,\n        ),\n        IntInput(\n            name=\"num_ctx\",\n            display_name=\"Context Window Size\",\n            info=\"Size of the context window for generating tokens. (Default: 2048)\",\n            advanced=True,\n        ),\n        IntInput(\n            name=\"num_gpu\",\n            display_name=\"Number of GPUs\",\n            info=\"Number of GPUs to use for computation. (Default: 1 on macOS, 0 to disable)\",\n            advanced=True,\n        ),\n        IntInput(\n            name=\"num_thread\",\n            display_name=\"Number of Threads\",\n            info=\"Number of threads to use during computation. (Default: detected for optimal performance)\",\n            advanced=True,\n        ),\n        IntInput(\n            name=\"repeat_last_n\",\n            display_name=\"Repeat Last N\",\n            info=\"How far back the model looks to prevent repetition. (Default: 64, 0 = disabled, -1 = num_ctx)\",\n            advanced=True,\n        ),\n        FloatInput(\n            name=\"repeat_penalty\",\n            display_name=\"Repeat Penalty\",\n            info=\"Penalty for repetitions in generated text. (Default: 1.1)\",\n            advanced=True,\n        ),\n        FloatInput(name=\"tfs_z\", display_name=\"TFS Z\", info=\"Tail free sampling value. (Default: 1)\", advanced=True),\n        IntInput(name=\"timeout\", display_name=\"Timeout\", info=\"Timeout for the request stream.\", advanced=True),\n        IntInput(\n            name=\"top_k\", display_name=\"Top K\", info=\"Limits token selection to top K. (Default: 40)\", advanced=True\n        ),\n        FloatInput(name=\"top_p\", display_name=\"Top P\", info=\"Works together with top-k. (Default: 0.9)\", advanced=True),\n        BoolInput(name=\"verbose\", display_name=\"Verbose\", info=\"Whether to print out response text.\", advanced=True),\n        MessageTextInput(\n            name=\"tags\",\n            display_name=\"Tags\",\n            info=\"Comma-separated list of tags to add to the run trace.\",\n            advanced=True,\n        ),\n        MessageTextInput(\n            name=\"stop_tokens\",\n            display_name=\"Stop Tokens\",\n            info=\"Comma-separated list of tokens to signal the model to stop generating text.\",\n            advanced=True,\n        ),\n        MessageTextInput(\n            name=\"system\", display_name=\"System\", info=\"System to use for generating text.\", advanced=True\n        ),\n        BoolInput(\n            name=\"tool_model_enabled\",\n            display_name=\"Tool Model Enabled\",\n            info=\"Whether to enable tool calling in the model.\",\n            value=False,\n            real_time_refresh=True,\n        ),\n        MessageTextInput(\n            name=\"template\", display_name=\"Template\", info=\"Template to use for generating text.\", advanced=True\n        ),\n        *LCModelComponent._base_inputs,\n    ]\n\n    def build_model(self) -> LanguageModel:  # type: ignore[type-var]\n        # Mapping mirostat settings to their corresponding values\n        mirostat_options = {\"Mirostat\": 1, \"Mirostat 2.0\": 2}\n\n        # Default to 0 for 'Disabled'\n        mirostat_value = mirostat_options.get(self.mirostat, 0)\n\n        # Set mirostat_eta and mirostat_tau to None if mirostat is disabled\n        if mirostat_value == 0:\n            mirostat_eta = None\n            mirostat_tau = None\n        else:\n            mirostat_eta = self.mirostat_eta\n            mirostat_tau = self.mirostat_tau\n\n        # Mapping system settings to their corresponding values\n        llm_params = {\n            \"base_url\": self.base_url,\n            \"model\": self.model_name,\n            \"mirostat\": mirostat_value,\n            \"format\": self.format,\n            \"metadata\": self.metadata,\n            \"tags\": self.tags.split(\",\") if self.tags else None,\n            \"mirostat_eta\": mirostat_eta,\n            \"mirostat_tau\": mirostat_tau,\n            \"num_ctx\": self.num_ctx or None,\n            \"num_gpu\": self.num_gpu or None,\n            \"num_thread\": self.num_thread or None,\n            \"repeat_last_n\": self.repeat_last_n or None,\n            \"repeat_penalty\": self.repeat_penalty or None,\n            \"temperature\": self.temperature or None,\n            \"stop\": self.stop_tokens.split(\",\") if self.stop_tokens else None,\n            \"system\": self.system,\n            \"tfs_z\": self.tfs_z or None,\n            \"timeout\": self.timeout or None,\n            \"top_k\": self.top_k or None,\n            \"top_p\": self.top_p or None,\n            \"verbose\": self.verbose,\n            \"template\": self.template,\n        }\n\n        # Remove parameters with None values\n        llm_params = {k: v for k, v in llm_params.items() if v is not None}\n\n        try:\n            output = ChatOllama(**llm_params)\n        except Exception as e:\n            msg = (\n                \"Unable to connect to the Ollama API. \",\n                \"Please verify the base URL, ensure the relevant Ollama model is pulled, and try again.\",\n            )\n            raise ValueError(msg) from e\n\n        return output\n\n    async def is_valid_ollama_url(self, url: str) -> bool:\n        try:\n            async with httpx.AsyncClient() as client:\n                return (await client.get(urljoin(url, \"api/tags\"))).status_code == HTTP_STATUS_OK\n        except httpx.RequestError:\n            return False\n\n    async def update_build_config(self, build_config: dict, field_value: Any, field_name: str | None = None):\n        if field_name == \"mirostat\":\n            if field_value == \"Disabled\":\n                build_config[\"mirostat_eta\"][\"advanced\"] = True\n                build_config[\"mirostat_tau\"][\"advanced\"] = True\n                build_config[\"mirostat_eta\"][\"value\"] = None\n                build_config[\"mirostat_tau\"][\"value\"] = None\n\n            else:\n                build_config[\"mirostat_eta\"][\"advanced\"] = False\n                build_config[\"mirostat_tau\"][\"advanced\"] = False\n\n                if field_value == \"Mirostat 2.0\":\n                    build_config[\"mirostat_eta\"][\"value\"] = 0.2\n                    build_config[\"mirostat_tau\"][\"value\"] = 10\n                else:\n                    build_config[\"mirostat_eta\"][\"value\"] = 0.1\n                    build_config[\"mirostat_tau\"][\"value\"] = 5\n\n        if field_name in {\"base_url\", \"model_name\"} and not await self.is_valid_ollama_url(\n            build_config[\"base_url\"].get(\"value\", \"\")\n        ):\n            # Check if any URL in the list is valid\n            valid_url = \"\"\n            for url in URL_LIST:\n                if await self.is_valid_ollama_url(url):\n                    valid_url = url\n                    break\n            if valid_url != \"\":\n                build_config[\"base_url\"][\"value\"] = valid_url\n            else:\n                msg = \"No valid Ollama URL found.\"\n                raise ValueError(msg)\n        if field_name in {\"model_name\", \"base_url\", \"tool_model_enabled\"}:\n            if await self.is_valid_ollama_url(self.base_url):\n                tool_model_enabled = build_config[\"tool_model_enabled\"].get(\"value\", False) or self.tool_model_enabled\n                build_config[\"model_name\"][\"options\"] = await self.get_model(self.base_url, tool_model_enabled)\n            elif await self.is_valid_ollama_url(build_config[\"base_url\"].get(\"value\", \"\")):\n                tool_model_enabled = build_config[\"tool_model_enabled\"].get(\"value\", False) or self.tool_model_enabled\n                build_config[\"model_name\"][\"options\"] = await self.get_model(\n                    build_config[\"base_url\"].get(\"value\", \"\"), tool_model_enabled\n                )\n            else:\n                build_config[\"model_name\"][\"options\"] = []\n        if field_name == \"keep_alive_flag\":\n            if field_value == \"Keep\":\n                build_config[\"keep_alive\"][\"value\"] = \"-1\"\n                build_config[\"keep_alive\"][\"advanced\"] = True\n            elif field_value == \"Immediately\":\n                build_config[\"keep_alive\"][\"value\"] = \"0\"\n                build_config[\"keep_alive\"][\"advanced\"] = True\n            else:\n                build_config[\"keep_alive\"][\"advanced\"] = False\n\n        return build_config\n\n    async def get_model(self, base_url_value: str, tool_model_enabled: bool | None = None) -> list[str]:\n        try:\n            url = urljoin(base_url_value, \"api/tags\")\n            async with httpx.AsyncClient() as client:\n                response = await client.get(url)\n                response.raise_for_status()\n                data = response.json()\n\n            model_ids = [model[\"name\"] for model in data.get(\"models\", [])]\n            # this to ensure that not embedding models are included.\n            # not even the base models since models can have 1b 2b etc\n            # handles cases when embeddings models have tags like :latest - etc.\n            model_ids = [\n                model\n                for model in model_ids\n                if not any(\n                    model == embedding_model or model.startswith(embedding_model.split(\"-\")[0])\n                    for embedding_model in OLLAMA_EMBEDDING_MODELS\n                )\n            ]\n\n        except (ImportError, ValueError, httpx.RequestError, Exception) as e:\n            msg = \"Could not get model names from Ollama.\"\n            raise ValueError(msg) from e\n        return (\n            model_ids if not tool_model_enabled else [model for model in model_ids if self.supports_tool_calling(model)]\n        )\n\n    def supports_tool_calling(self, model: str) -> bool:\n        \"\"\"Check if model name is in the base of any models example llama3.3 can have 1b and 2b.\"\"\"\n        return any(model.startswith(f\"{tool_model}\") for tool_model in OLLAMA_TOOL_MODELS_BASE)\n",
+                "fileTypes": [],
+                "file_path": "",
+                "password": false,
+                "name": "code",
+                "advanced": true,
+                "dynamic": true,
+                "info": "",
+                "load_from_db": false,
+                "title_case": false
+              },
+              "format": {
+                "tool_mode": false,
+                "trace_as_input": true,
+                "trace_as_metadata": true,
+                "load_from_db": false,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "format",
+                "value": "",
+                "display_name": "Format",
+                "advanced": true,
+                "input_types": [
+                  "Message"
+                ],
+                "dynamic": false,
+                "info": "Specify the format of the output (e.g., json).",
+                "title_case": false,
+                "type": "str",
+                "_input_type": "MessageTextInput"
+              },
+              "input_value": {
+                "trace_as_input": true,
+                "tool_mode": false,
+                "trace_as_metadata": true,
+                "load_from_db": false,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "input_value",
+                "value": "",
+                "display_name": "Input",
+                "advanced": false,
+                "input_types": [
+                  "Message"
+                ],
+                "dynamic": false,
+                "info": "",
+                "title_case": false,
+                "type": "str",
+                "_input_type": "MessageInput"
+              },
+              "metadata": {
+                "tool_mode": false,
+                "trace_as_input": true,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "metadata",
+                "value": {},
+                "display_name": "Metadata",
+                "advanced": true,
+                "dynamic": false,
+                "info": "Metadata to add to the run trace.",
+                "title_case": false,
+                "type": "dict",
+                "_input_type": "DictInput"
+              },
+              "mirostat": {
+                "tool_mode": false,
+                "trace_as_metadata": true,
+                "options": [
+                  "Disabled",
+                  "Mirostat",
+                  "Mirostat 2.0"
+                ],
+                "options_metadata": [],
+                "combobox": false,
+                "dialog_inputs": {},
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "mirostat",
+                "value": "Disabled",
+                "display_name": "Mirostat",
+                "advanced": true,
+                "dynamic": false,
+                "info": "Enable/disable Mirostat sampling for controlling perplexity.",
+                "real_time_refresh": true,
+                "title_case": false,
+                "type": "str",
+                "_input_type": "DropdownInput"
+              },
+              "mirostat_eta": {
+                "tool_mode": false,
+                "trace_as_metadata": true,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "mirostat_eta",
+                "value": "",
+                "display_name": "Mirostat Eta",
+                "advanced": true,
+                "dynamic": false,
+                "info": "Learning rate for Mirostat algorithm. (Default: 0.1)",
+                "title_case": false,
+                "type": "float",
+                "_input_type": "FloatInput"
+              },
+              "mirostat_tau": {
+                "tool_mode": false,
+                "trace_as_metadata": true,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "mirostat_tau",
+                "value": "",
+                "display_name": "Mirostat Tau",
+                "advanced": true,
+                "dynamic": false,
+                "info": "Controls the balance between coherence and diversity of the output. (Default: 5.0)",
+                "title_case": false,
+                "type": "float",
+                "_input_type": "FloatInput"
+              },
+              "model_name": {
+                "tool_mode": false,
+                "trace_as_metadata": true,
+                "options": [
+                  "mistral:latest",
+                  "llama3:latest"
+                ],
+                "options_metadata": [],
+                "combobox": false,
+                "dialog_inputs": {},
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "model_name",
+                "value": "llama3:latest",
+                "display_name": "Model Name",
+                "advanced": false,
+                "dynamic": false,
+                "info": "Refer to https://ollama.com/library for more models.",
+                "real_time_refresh": true,
+                "refresh_button": true,
+                "title_case": false,
+                "type": "str",
+                "_input_type": "DropdownInput",
+                "load_from_db": false
+              },
+              "num_ctx": {
+                "tool_mode": false,
+                "trace_as_metadata": true,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "num_ctx",
+                "value": "",
+                "display_name": "Context Window Size",
+                "advanced": true,
+                "dynamic": false,
+                "info": "Size of the context window for generating tokens. (Default: 2048)",
+                "title_case": false,
+                "type": "int",
+                "_input_type": "IntInput"
+              },
+              "num_gpu": {
+                "tool_mode": false,
+                "trace_as_metadata": true,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "num_gpu",
+                "value": "",
+                "display_name": "Number of GPUs",
+                "advanced": true,
+                "dynamic": false,
+                "info": "Number of GPUs to use for computation. (Default: 1 on macOS, 0 to disable)",
+                "title_case": false,
+                "type": "int",
+                "_input_type": "IntInput"
+              },
+              "num_thread": {
+                "tool_mode": false,
+                "trace_as_metadata": true,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "num_thread",
+                "value": "",
+                "display_name": "Number of Threads",
+                "advanced": true,
+                "dynamic": false,
+                "info": "Number of threads to use during computation. (Default: detected for optimal performance)",
+                "title_case": false,
+                "type": "int",
+                "_input_type": "IntInput"
+              },
+              "repeat_last_n": {
+                "tool_mode": false,
+                "trace_as_metadata": true,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "repeat_last_n",
+                "value": "",
+                "display_name": "Repeat Last N",
+                "advanced": true,
+                "dynamic": false,
+                "info": "How far back the model looks to prevent repetition. (Default: 64, 0 = disabled, -1 = num_ctx)",
+                "title_case": false,
+                "type": "int",
+                "_input_type": "IntInput"
+              },
+              "repeat_penalty": {
+                "tool_mode": false,
+                "trace_as_metadata": true,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "repeat_penalty",
+                "value": "",
+                "display_name": "Repeat Penalty",
+                "advanced": true,
+                "dynamic": false,
+                "info": "Penalty for repetitions in generated text. (Default: 1.1)",
+                "title_case": false,
+                "type": "float",
+                "_input_type": "FloatInput"
+              },
+              "stop_tokens": {
+                "tool_mode": false,
+                "trace_as_input": true,
+                "trace_as_metadata": true,
+                "load_from_db": false,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "stop_tokens",
+                "value": "",
+                "display_name": "Stop Tokens",
+                "advanced": true,
+                "input_types": [
+                  "Message"
+                ],
+                "dynamic": false,
+                "info": "Comma-separated list of tokens to signal the model to stop generating text.",
+                "title_case": false,
+                "type": "str",
+                "_input_type": "MessageTextInput"
+              },
+              "stream": {
+                "tool_mode": false,
+                "trace_as_metadata": true,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "stream",
+                "value": false,
+                "display_name": "Stream",
+                "advanced": false,
+                "dynamic": false,
+                "info": "Stream the response from the model. Streaming works only in Chat.",
+                "title_case": false,
+                "type": "bool",
+                "_input_type": "BoolInput"
+              },
+              "system": {
+                "tool_mode": false,
+                "trace_as_input": true,
+                "trace_as_metadata": true,
+                "load_from_db": false,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "system",
+                "value": "",
+                "display_name": "System",
+                "advanced": true,
+                "input_types": [
+                  "Message"
+                ],
+                "dynamic": false,
+                "info": "System to use for generating text.",
+                "title_case": false,
+                "type": "str",
+                "_input_type": "MessageTextInput"
+              },
+              "system_message": {
+                "tool_mode": false,
+                "trace_as_input": true,
+                "multiline": true,
+                "trace_as_metadata": true,
+                "load_from_db": false,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "system_message",
+                "value": "",
+                "display_name": "System Message",
+                "advanced": false,
+                "input_types": [
+                  "Message"
+                ],
+                "dynamic": false,
+                "info": "System message to pass to the model.",
+                "title_case": false,
+                "type": "str",
+                "_input_type": "MultilineInput"
+              },
+              "tags": {
+                "tool_mode": false,
+                "trace_as_input": true,
+                "trace_as_metadata": true,
+                "load_from_db": false,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "tags",
+                "value": "",
+                "display_name": "Tags",
+                "advanced": true,
+                "input_types": [
+                  "Message"
+                ],
+                "dynamic": false,
+                "info": "Comma-separated list of tags to add to the run trace.",
+                "title_case": false,
+                "type": "str",
+                "_input_type": "MessageTextInput"
+              },
+              "temperature": {
+                "tool_mode": false,
+                "min_label": "",
+                "max_label": "",
+                "min_label_icon": "",
+                "max_label_icon": "",
+                "slider_buttons": false,
+                "slider_buttons_options": [],
+                "slider_input": false,
+                "range_spec": {
+                  "step_type": "float",
+                  "min": 0,
+                  "max": 1,
+                  "step": 0.01
+                },
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "temperature",
+                "value": 0.1,
+                "display_name": "Temperature",
+                "advanced": false,
+                "dynamic": false,
+                "info": "",
+                "title_case": false,
+                "type": "slider",
+                "_input_type": "SliderInput"
+              },
+              "template": {
+                "tool_mode": false,
+                "trace_as_input": true,
+                "trace_as_metadata": true,
+                "load_from_db": false,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "template",
+                "value": "",
+                "display_name": "Template",
+                "advanced": true,
+                "input_types": [
+                  "Message"
+                ],
+                "dynamic": false,
+                "info": "Template to use for generating text.",
+                "title_case": false,
+                "type": "str",
+                "_input_type": "MessageTextInput"
+              },
+              "tfs_z": {
+                "tool_mode": false,
+                "trace_as_metadata": true,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "tfs_z",
+                "value": "",
+                "display_name": "TFS Z",
+                "advanced": true,
+                "dynamic": false,
+                "info": "Tail free sampling value. (Default: 1)",
+                "title_case": false,
+                "type": "float",
+                "_input_type": "FloatInput"
+              },
+              "timeout": {
+                "tool_mode": false,
+                "trace_as_metadata": true,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "timeout",
+                "value": "",
+                "display_name": "Timeout",
+                "advanced": true,
+                "dynamic": false,
+                "info": "Timeout for the request stream.",
+                "title_case": false,
+                "type": "int",
+                "_input_type": "IntInput"
+              },
+              "tool_model_enabled": {
+                "tool_mode": false,
+                "trace_as_metadata": true,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "tool_model_enabled",
+                "value": false,
+                "display_name": "Tool Model Enabled",
+                "advanced": false,
+                "dynamic": false,
+                "info": "Whether to enable tool calling in the model.",
+                "real_time_refresh": true,
+                "title_case": false,
+                "type": "bool",
+                "_input_type": "BoolInput"
+              },
+              "top_k": {
+                "tool_mode": false,
+                "trace_as_metadata": true,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "top_k",
+                "value": "",
+                "display_name": "Top K",
+                "advanced": true,
+                "dynamic": false,
+                "info": "Limits token selection to top K. (Default: 40)",
+                "title_case": false,
+                "type": "int",
+                "_input_type": "IntInput"
+              },
+              "top_p": {
+                "tool_mode": false,
+                "trace_as_metadata": true,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "top_p",
+                "value": "",
+                "display_name": "Top P",
+                "advanced": true,
+                "dynamic": false,
+                "info": "Works together with top-k. (Default: 0.9)",
+                "title_case": false,
+                "type": "float",
+                "_input_type": "FloatInput"
+              },
+              "verbose": {
+                "tool_mode": false,
+                "trace_as_metadata": true,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "verbose",
+                "value": false,
+                "display_name": "Verbose",
+                "advanced": true,
+                "dynamic": false,
+                "info": "Whether to print out response text.",
+                "title_case": false,
+                "type": "bool",
+                "_input_type": "BoolInput"
+              }
+            },
+            "description": "Generate text using Ollama Local LLMs.",
+            "icon": "Ollama",
+            "base_classes": [
+              "LanguageModel",
+              "Message"
+            ],
+            "display_name": "Ollama",
+            "documentation": "",
+            "minimized": false,
+            "custom_fields": {},
+            "output_types": [],
+            "pinned": false,
+            "conditional_paths": [],
+            "frozen": false,
+            "outputs": [
+              {
+                "types": [
+                  "Message"
+                ],
+                "selected": "Message",
+                "name": "text_output",
+                "hidden": null,
+                "display_name": "Message",
+                "method": "text_response",
+                "value": "__UNDEFINED__",
+                "cache": true,
+                "required_inputs": [],
+                "allows_loop": false,
+                "tool_mode": true
+              },
+              {
+                "types": [
+                  "LanguageModel"
+                ],
+                "selected": "LanguageModel",
+                "name": "model_output",
+                "hidden": null,
+                "display_name": "Language Model",
+                "method": "build_model",
+                "value": "__UNDEFINED__",
+                "cache": true,
+                "required_inputs": [],
+                "allows_loop": false,
+                "tool_mode": true
+              }
+            ],
+            "field_order": [
+              "base_url",
+              "model_name",
+              "temperature",
+              "format",
+              "metadata",
+              "mirostat",
+              "mirostat_eta",
+              "mirostat_tau",
+              "num_ctx",
+              "num_gpu",
+              "num_thread",
+              "repeat_last_n",
+              "repeat_penalty",
+              "tfs_z",
+              "timeout",
+              "top_k",
+              "top_p",
+              "verbose",
+              "tags",
+              "stop_tokens",
+              "system",
+              "tool_model_enabled",
+              "template",
+              "input_value",
+              "system_message",
+              "stream"
+            ],
+            "beta": false,
+            "legacy": false,
+            "edited": false,
+            "metadata": {},
+            "tool_mode": false,
+            "lf_version": "1.2.0"
+          },
+          "id": "OllamaModel-rcXS4"
+        },
+        "selected": false,
+        "measured": {
+          "width": 320,
+          "height": 695
+        }
+      },
+      {
+        "id": "ChatOutput-bRclp",
+        "type": "genericNode",
+        "position": {
+          "x": 3275.1538864913746,
+          "y": 999.2346282120143
+        },
+        "data": {
+          "type": "ChatOutput",
+          "node": {
+            "template": {
+              "_type": "Component",
+              "input_value": {
+                "trace_as_metadata": true,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": true,
+                "placeholder": "",
+                "show": true,
+                "name": "input_value",
+                "value": "",
+                "display_name": "Text",
+                "advanced": false,
+                "input_types": [
+                  "Data",
+                  "DataFrame",
+                  "Message"
+                ],
+                "dynamic": false,
+                "info": "Message to be passed as output.",
+                "title_case": false,
+                "type": "other",
+                "_input_type": "HandleInput"
+              },
+              "background_color": {
+                "tool_mode": false,
+                "trace_as_input": true,
+                "trace_as_metadata": true,
+                "load_from_db": false,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "background_color",
+                "value": "",
+                "display_name": "Background Color",
+                "advanced": true,
+                "input_types": [
+                  "Message"
+                ],
+                "dynamic": false,
+                "info": "The background color of the icon.",
+                "title_case": false,
+                "type": "str",
+                "_input_type": "MessageTextInput"
+              },
+              "chat_icon": {
+                "tool_mode": false,
+                "trace_as_input": true,
+                "trace_as_metadata": true,
+                "load_from_db": false,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "chat_icon",
+                "value": "",
+                "display_name": "Icon",
+                "advanced": true,
+                "input_types": [
+                  "Message"
+                ],
+                "dynamic": false,
+                "info": "The icon of the message.",
+                "title_case": false,
+                "type": "str",
+                "_input_type": "MessageTextInput"
+              },
+              "clean_data": {
+                "tool_mode": false,
+                "trace_as_metadata": true,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "clean_data",
+                "value": true,
+                "display_name": "Basic Clean Data",
+                "advanced": true,
+                "dynamic": false,
+                "info": "Whether to clean the data",
+                "title_case": false,
+                "type": "bool",
+                "_input_type": "BoolInput"
+              },
+              "code": {
+                "type": "code",
+                "required": true,
+                "placeholder": "",
+                "list": false,
+                "show": true,
+                "multiline": true,
+                "value": "from collections.abc import Generator\nfrom typing import Any\n\nfrom langflow.base.io.chat import ChatComponent\nfrom langflow.inputs import BoolInput\nfrom langflow.inputs.inputs import HandleInput\nfrom langflow.io import DropdownInput, MessageTextInput, Output\nfrom langflow.schema.data import Data\nfrom langflow.schema.dataframe import DataFrame\nfrom langflow.schema.message import Message\nfrom langflow.schema.properties import Source\nfrom langflow.utils.constants import (\n    MESSAGE_SENDER_AI,\n    MESSAGE_SENDER_NAME_AI,\n    MESSAGE_SENDER_USER,\n)\n\n\nclass ChatOutput(ChatComponent):\n    display_name = \"Chat Output\"\n    description = \"Display a chat message in the Playground.\"\n    icon = \"MessagesSquare\"\n    name = \"ChatOutput\"\n    minimized = True\n\n    inputs = [\n        HandleInput(\n            name=\"input_value\",\n            display_name=\"Text\",\n            info=\"Message to be passed as output.\",\n            input_types=[\"Data\", \"DataFrame\", \"Message\"],\n            required=True,\n        ),\n        BoolInput(\n            name=\"should_store_message\",\n            display_name=\"Store Messages\",\n            info=\"Store the message in the history.\",\n            value=True,\n            advanced=True,\n        ),\n        DropdownInput(\n            name=\"sender\",\n            display_name=\"Sender Type\",\n            options=[MESSAGE_SENDER_AI, MESSAGE_SENDER_USER],\n            value=MESSAGE_SENDER_AI,\n            advanced=True,\n            info=\"Type of sender.\",\n        ),\n        MessageTextInput(\n            name=\"sender_name\",\n            display_name=\"Sender Name\",\n            info=\"Name of the sender.\",\n            value=MESSAGE_SENDER_NAME_AI,\n            advanced=True,\n        ),\n        MessageTextInput(\n            name=\"session_id\",\n            display_name=\"Session ID\",\n            info=\"The session ID of the chat. If empty, the current session ID parameter will be used.\",\n            advanced=True,\n        ),\n        MessageTextInput(\n            name=\"data_template\",\n            display_name=\"Data Template\",\n            value=\"{text}\",\n            advanced=True,\n            info=\"Template to convert Data to Text. If left empty, it will be dynamically set to the Data's text key.\",\n        ),\n        MessageTextInput(\n            name=\"background_color\",\n            display_name=\"Background Color\",\n            info=\"The background color of the icon.\",\n            advanced=True,\n        ),\n        MessageTextInput(\n            name=\"chat_icon\",\n            display_name=\"Icon\",\n            info=\"The icon of the message.\",\n            advanced=True,\n        ),\n        MessageTextInput(\n            name=\"text_color\",\n            display_name=\"Text Color\",\n            info=\"The text color of the name\",\n            advanced=True,\n        ),\n        BoolInput(\n            name=\"clean_data\",\n            display_name=\"Basic Clean Data\",\n            value=True,\n            info=\"Whether to clean the data\",\n            advanced=True,\n        ),\n    ]\n    outputs = [\n        Output(\n            display_name=\"Message\",\n            name=\"message\",\n            method=\"message_response\",\n        ),\n    ]\n\n    def _build_source(self, id_: str | None, display_name: str | None, source: str | None) -> Source:\n        source_dict = {}\n        if id_:\n            source_dict[\"id\"] = id_\n        if display_name:\n            source_dict[\"display_name\"] = display_name\n        if source:\n            # Handle case where source is a ChatOpenAI object\n            if hasattr(source, \"model_name\"):\n                source_dict[\"source\"] = source.model_name\n            elif hasattr(source, \"model\"):\n                source_dict[\"source\"] = str(source.model)\n            else:\n                source_dict[\"source\"] = str(source)\n        return Source(**source_dict)\n\n    async def message_response(self) -> Message:\n        # First convert the input to string if needed\n        text = self.convert_to_string()\n        # Get source properties\n        source, icon, display_name, source_id = self.get_properties_from_source_component()\n        background_color = self.background_color\n        text_color = self.text_color\n        if self.chat_icon:\n            icon = self.chat_icon\n\n        # Create or use existing Message object\n        if isinstance(self.input_value, Message):\n            message = self.input_value\n            # Update message properties\n            message.text = text\n        else:\n            message = Message(text=text)\n\n        # Set message properties\n        message.sender = self.sender\n        message.sender_name = self.sender_name\n        message.session_id = self.session_id\n        message.flow_id = self.graph.flow_id if hasattr(self, \"graph\") else None\n        message.properties.source = self._build_source(source_id, display_name, source)\n        message.properties.icon = icon\n        message.properties.background_color = background_color\n        message.properties.text_color = text_color\n\n        # Store message if needed\n        if self.session_id and self.should_store_message:\n            stored_message = await self.send_message(message)\n            self.message.value = stored_message\n            message = stored_message\n\n        self.status = message\n        return message\n\n    def _validate_input(self) -> None:\n        \"\"\"Validate the input data and raise ValueError if invalid.\"\"\"\n        if self.input_value is None:\n            msg = \"Input data cannot be None\"\n            raise ValueError(msg)\n        if isinstance(self.input_value, list) and not all(\n            isinstance(item, Message | Data | DataFrame | str) for item in self.input_value\n        ):\n            invalid_types = [\n                type(item).__name__\n                for item in self.input_value\n                if not isinstance(item, Message | Data | DataFrame | str)\n            ]\n            msg = f\"Expected Data or DataFrame or Message or str, got {invalid_types}\"\n            raise TypeError(msg)\n        if not isinstance(\n            self.input_value,\n            Message | Data | DataFrame | str | list | Generator | type(None),\n        ):\n            type_name = type(self.input_value).__name__\n            msg = f\"Expected Data or DataFrame or Message or str, Generator or None, got {type_name}\"\n            raise TypeError(msg)\n\n    def _safe_convert(self, data: Any) -> str:\n        \"\"\"Safely convert input data to string.\"\"\"\n        try:\n            if isinstance(data, str):\n                return data\n            if isinstance(data, Message):\n                return data.get_text()\n            if isinstance(data, Data):\n                if data.get_text() is None:\n                    msg = \"Empty Data object\"\n                    raise ValueError(msg)\n                return data.get_text()\n            if isinstance(data, DataFrame):\n                if self.clean_data:\n                    # Remove empty rows\n                    data = data.dropna(how=\"all\")\n                    # Remove empty lines in each cell\n                    data = data.replace(r\"^\\s*$\", \"\", regex=True)\n                    # Replace multiple newlines with a single newline\n                    data = data.replace(r\"\\n+\", \"\\n\", regex=True)\n                return (\n                    data.replace(r\"\\|\", r\"\\\\|\", regex=True)\n                    .applymap(lambda x: (str(x).replace(\"\\n\", \"<br/>\") if isinstance(x, str) else x))\n                    .to_markdown(index=False)\n                )\n            return str(data)\n        except (ValueError, TypeError, AttributeError) as e:\n            msg = f\"Error converting data: {e!s}\"\n            raise ValueError(msg) from e\n\n    def convert_to_string(self) -> str | Generator[Any, None, None]:\n        \"\"\"Convert input data to string with proper error handling.\"\"\"\n        self._validate_input()\n        if isinstance(self.input_value, list):\n            return \"\\n\".join([self._safe_convert(item) for item in self.input_value])\n        if isinstance(self.input_value, Generator):\n            return self.input_value\n        return self._safe_convert(self.input_value)\n",
+                "fileTypes": [],
+                "file_path": "",
+                "password": false,
+                "name": "code",
+                "advanced": true,
+                "dynamic": true,
+                "info": "",
+                "load_from_db": false,
+                "title_case": false
+              },
+              "data_template": {
+                "tool_mode": false,
+                "trace_as_input": true,
+                "trace_as_metadata": true,
+                "load_from_db": false,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "data_template",
+                "value": "{text}",
+                "display_name": "Data Template",
+                "advanced": true,
+                "input_types": [
+                  "Message"
+                ],
+                "dynamic": false,
+                "info": "Template to convert Data to Text. If left empty, it will be dynamically set to the Data's text key.",
+                "title_case": false,
+                "type": "str",
+                "_input_type": "MessageTextInput"
+              },
+              "sender": {
+                "tool_mode": false,
+                "trace_as_metadata": true,
+                "options": [
+                  "Machine",
+                  "User"
+                ],
+                "options_metadata": [],
+                "combobox": false,
+                "dialog_inputs": {},
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "sender",
+                "value": "Machine",
+                "display_name": "Sender Type",
+                "advanced": true,
+                "dynamic": false,
+                "info": "Type of sender.",
+                "title_case": false,
+                "type": "str",
+                "_input_type": "DropdownInput"
+              },
+              "sender_name": {
+                "tool_mode": false,
+                "trace_as_input": true,
+                "trace_as_metadata": true,
+                "load_from_db": false,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "sender_name",
+                "value": "AI",
+                "display_name": "Sender Name",
+                "advanced": true,
+                "input_types": [
+                  "Message"
+                ],
+                "dynamic": false,
+                "info": "Name of the sender.",
+                "title_case": false,
+                "type": "str",
+                "_input_type": "MessageTextInput"
+              },
+              "session_id": {
+                "tool_mode": false,
+                "trace_as_input": true,
+                "trace_as_metadata": true,
+                "load_from_db": false,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "session_id",
+                "value": "",
+                "display_name": "Session ID",
+                "advanced": false,
+                "input_types": [
+                  "Message"
+                ],
+                "dynamic": false,
+                "info": "The session ID of the chat. If empty, the current session ID parameter will be used.",
+                "title_case": false,
+                "type": "str",
+                "_input_type": "MessageTextInput"
+              },
+              "should_store_message": {
+                "tool_mode": false,
+                "trace_as_metadata": true,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "should_store_message",
+                "value": true,
+                "display_name": "Store Messages",
+                "advanced": true,
+                "dynamic": false,
+                "info": "Store the message in the history.",
+                "title_case": false,
+                "type": "bool",
+                "_input_type": "BoolInput"
+              },
+              "text_color": {
+                "tool_mode": false,
+                "trace_as_input": true,
+                "trace_as_metadata": true,
+                "load_from_db": false,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "text_color",
+                "value": "",
+                "display_name": "Text Color",
+                "advanced": true,
+                "input_types": [
+                  "Message"
+                ],
+                "dynamic": false,
+                "info": "The text color of the name",
+                "title_case": false,
+                "type": "str",
+                "_input_type": "MessageTextInput"
+              }
+            },
+            "description": "Display a chat message in the Playground.",
+            "icon": "MessagesSquare",
+            "base_classes": [
+              "Message"
+            ],
+            "display_name": "Chat Output",
+            "documentation": "",
+            "minimized": true,
+            "custom_fields": {},
+            "output_types": [],
+            "pinned": false,
+            "conditional_paths": [],
+            "frozen": false,
+            "outputs": [
+              {
+                "types": [
+                  "Message"
+                ],
+                "selected": "Message",
+                "name": "message",
+                "hidden": null,
+                "display_name": "Message",
+                "method": "message_response",
+                "value": "__UNDEFINED__",
+                "cache": true,
+                "required_inputs": null,
+                "allows_loop": false,
+                "tool_mode": true
+              }
+            ],
+            "field_order": [
+              "input_value",
+              "should_store_message",
+              "sender",
+              "sender_name",
+              "session_id",
+              "data_template",
+              "background_color",
+              "chat_icon",
+              "text_color",
+              "clean_data"
+            ],
+            "beta": false,
+            "legacy": false,
+            "edited": false,
+            "metadata": {},
+            "tool_mode": false,
+            "lf_version": "1.2.0"
+          },
+          "id": "ChatOutput-bRclp"
+        },
+        "selected": false,
+        "measured": {
+          "width": 320,
+          "height": 273
+        }
+      },
+      {
+        "id": "TextInput-GngwV",
+        "type": "genericNode",
+        "position": {
+          "x": -71.9791424706018,
+          "y": 534.6780340252841
+        },
+        "data": {
+          "type": "TextInput",
+          "node": {
+            "template": {
+              "_type": "Component",
+              "code": {
+                "type": "code",
+                "required": true,
+                "placeholder": "",
+                "list": false,
+                "show": true,
+                "multiline": true,
+                "value": "from langflow.base.io.text import TextComponent\nfrom langflow.io import MessageTextInput, Output\nfrom langflow.schema.message import Message\n\n\nclass TextInputComponent(TextComponent):\n    display_name = \"Text Input\"\n    description = \"Get text inputs from the Playground.\"\n    icon = \"type\"\n    name = \"TextInput\"\n\n    inputs = [\n        MessageTextInput(\n            name=\"input_value\",\n            display_name=\"Text\",\n            info=\"Text to be passed as input.\",\n        ),\n    ]\n    outputs = [\n        Output(display_name=\"Text\", name=\"text\", method=\"text_response\"),\n    ]\n\n    def text_response(self) -> Message:\n        message = Message(\n            text=self.input_value,\n        )\n        return message\n",
+                "fileTypes": [],
+                "file_path": "",
+                "password": false,
+                "name": "code",
+                "advanced": true,
+                "dynamic": true,
+                "info": "",
+                "load_from_db": false,
+                "title_case": false
+              },
+              "input_value": {
+                "trace_as_input": true,
+                "trace_as_metadata": true,
+                "load_from_db": false,
+                "list": false,
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "input_value",
+                "value": "OAPI-10686 ",
+                "display_name": "Text",
+                "advanced": false,
+                "input_types": [
+                  "Message"
+                ],
+                "dynamic": false,
+                "info": "Text to be passed as input.",
+                "title_case": false,
+                "type": "str",
+                "_input_type": "MessageTextInput"
+              }
+            },
+            "description": "Get text inputs from the Playground.",
+            "icon": "type",
+            "base_classes": [
+              "Message"
+            ],
+            "display_name": "Text Input",
+            "documentation": "",
+            "custom_fields": {},
+            "output_types": [],
+            "pinned": false,
+            "conditional_paths": [],
+            "frozen": false,
+            "outputs": [
+              {
+                "types": [
+                  "Message"
+                ],
+                "selected": "Message",
+                "name": "text",
+                "display_name": "Text",
+                "method": "text_response",
+                "value": "__UNDEFINED__",
+                "cache": true
+              }
+            ],
+            "field_order": [
+              "input_value"
+            ],
+            "beta": false,
+            "edited": true,
+            "lf_version": "1.2.0"
+          },
+          "id": "TextInput-GngwV"
+        },
+        "selected": false,
+        "measured": {
+          "width": 320,
+          "height": 229
+        }
+      },
+      {
+        "id": "Prompt-TOhrY",
+        "type": "genericNode",
+        "position": {
+          "x": 635.0292143206434,
+          "y": 481.2157610322122
+        },
+        "data": {
+          "type": "Prompt",
+          "node": {
+            "template": {
+              "_type": "Component",
+              "code": {
+                "type": "code",
+                "required": true,
+                "placeholder": "",
+                "list": false,
+                "show": true,
+                "multiline": true,
+                "value": "from langflow.base.prompts.api_utils import process_prompt_template\nfrom langflow.custom import Component\nfrom langflow.inputs.inputs import DefaultPromptField\nfrom langflow.io import MessageTextInput, Output, PromptInput\nfrom langflow.schema.message import Message\nfrom langflow.template.utils import update_template_values\n\n\nclass PromptComponent(Component):\n    display_name: str = \"Prompt\"\n    description: str = \"Create a prompt template with dynamic variables.\"\n    icon = \"prompts\"\n    trace_type = \"prompt\"\n    name = \"Prompt\"\n\n    inputs = [\n        PromptInput(name=\"template\", display_name=\"Template\"),\n        MessageTextInput(\n            name=\"tool_placeholder\",\n            display_name=\"Tool Placeholder\",\n            tool_mode=True,\n            advanced=True,\n            info=\"A placeholder input for tool mode.\",\n        ),\n    ]\n\n    outputs = [\n        Output(display_name=\"Prompt Message\", name=\"prompt\", method=\"build_prompt\"),\n    ]\n\n    async def build_prompt(self) -> Message:\n        prompt = Message.from_template(**self._attributes)\n        self.status = prompt.text\n        return prompt\n\n    def _update_template(self, frontend_node: dict):\n        prompt_template = frontend_node[\"template\"][\"template\"][\"value\"]\n        custom_fields = frontend_node[\"custom_fields\"]\n        frontend_node_template = frontend_node[\"template\"]\n        _ = process_prompt_template(\n            template=prompt_template,\n            name=\"template\",\n            custom_fields=custom_fields,\n            frontend_node_template=frontend_node_template,\n        )\n        return frontend_node\n\n    async def update_frontend_node(self, new_frontend_node: dict, current_frontend_node: dict):\n        \"\"\"This function is called after the code validation is done.\"\"\"\n        frontend_node = await super().update_frontend_node(new_frontend_node, current_frontend_node)\n        template = frontend_node[\"template\"][\"template\"][\"value\"]\n        # Kept it duplicated for backwards compatibility\n        _ = process_prompt_template(\n            template=template,\n            name=\"template\",\n            custom_fields=frontend_node[\"custom_fields\"],\n            frontend_node_template=frontend_node[\"template\"],\n        )\n        # Now that template is updated, we need to grab any values that were set in the current_frontend_node\n        # and update the frontend_node with those values\n        update_template_values(new_template=frontend_node, previous_template=current_frontend_node[\"template\"])\n        return frontend_node\n\n    def _get_fallback_input(self, **kwargs):\n        return DefaultPromptField(**kwargs)\n",
+                "fileTypes": [],
+                "file_path": "",
+                "password": false,
+                "name": "code",
+                "advanced": true,
+                "dynamic": true,
+                "info": "",
+                "load_from_db": false,
+                "title_case": false
+              },
+              "template": {
+                "tool_mode": false,
+                "trace_as_input": true,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "template",
+                "value": "\n\nUser request {req_request}",
+                "display_name": "Template",
+                "advanced": false,
+                "dynamic": false,
+                "info": "",
+                "title_case": false,
+                "type": "prompt",
+                "_input_type": "PromptInput",
+                "load_from_db": false
+              },
+              "tool_placeholder": {
+                "tool_mode": true,
+                "trace_as_input": true,
+                "trace_as_metadata": true,
+                "load_from_db": false,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "tool_placeholder",
+                "value": "",
+                "display_name": "Tool Placeholder",
+                "advanced": true,
+                "input_types": [
+                  "Message"
+                ],
+                "dynamic": false,
+                "info": "A placeholder input for tool mode.",
+                "title_case": false,
+                "type": "str",
+                "_input_type": "MessageTextInput"
+              },
+              "req_request": {
+                "field_type": "str",
+                "required": false,
+                "placeholder": "",
+                "list": false,
+                "show": true,
+                "multiline": true,
+                "value": "",
+                "fileTypes": [],
+                "file_path": "",
+                "name": "req_request",
+                "display_name": "req_request",
+                "advanced": false,
+                "input_types": [
+                  "Message"
+                ],
+                "dynamic": false,
+                "info": "",
+                "load_from_db": false,
+                "title_case": false,
+                "type": "str"
+              }
+            },
+            "description": "Create a prompt template with dynamic variables.",
+            "icon": "prompts",
+            "base_classes": [
+              "Message"
+            ],
+            "display_name": "Prompt",
+            "documentation": "",
+            "minimized": false,
+            "custom_fields": {
+              "template": [
+                "req_request"
+              ]
+            },
+            "output_types": [],
+            "pinned": false,
+            "conditional_paths": [],
+            "frozen": false,
+            "outputs": [
+              {
+                "types": [
+                  "Message"
+                ],
+                "selected": "Message",
+                "name": "prompt",
+                "hidden": null,
+                "display_name": "Prompt Message",
+                "method": "build_prompt",
+                "value": "__UNDEFINED__",
+                "cache": true,
+                "required_inputs": null,
+                "allows_loop": false,
+                "tool_mode": true
+              }
+            ],
+            "field_order": [
+              "template",
+              "tool_placeholder"
+            ],
+            "beta": false,
+            "legacy": false,
+            "edited": false,
+            "metadata": {},
+            "tool_mode": false,
+            "lf_version": "1.2.0"
+          },
+          "id": "Prompt-TOhrY"
+        },
+        "selected": false,
+        "measured": {
+          "width": 320,
+          "height": 331
+        }
+      },
+      {
+        "id": "JiraSearchTickets-qrfGh",
+        "type": "genericNode",
+        "position": {
+          "x": -66.68472259712534,
+          "y": 1333.5587788958537
+        },
+        "data": {
+          "type": "JiraSearchTickets",
+          "node": {
+            "template": {
+              "_type": "Component",
+              "api_token": {
+                "load_from_db": false,
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "api_token",
+                "value": "",
+                "display_name": "API Token",
+                "advanced": false,
+                "input_types": [
+                  "Message"
+                ],
+                "dynamic": false,
+                "info": "Your Jira API token",
+                "title_case": false,
+                "password": true,
+                "type": "str",
+                "_input_type": "SecretStrInput"
+              },
+              "code": {
+                "type": "code",
+                "required": true,
+                "placeholder": "",
+                "list": false,
+                "show": true,
+                "multiline": true,
+                "value": "from typing import Any, Sequence, Dict, Optional, List\nimport requests\nfrom langchain_core.tools import Tool\nfrom loguru import logger\n\nfrom langflow.base.langchain_utilities.model import LCToolComponent\nfrom langflow.inputs import MessageTextInput, SecretStrInput, DropdownInput, IntInput, BoolInput\n\n\nclass JiraSearchTicketComponent(LCToolComponent):\n    display_name: str = \"Jira Search Tickets\"\n    description: str = \"Search tickets in Jira based on various criteria\"\n    name = \"JiraSearchTickets\"\n    icon = \"Jira\"\n    documentation: str = \"https://docs.langflow.org\"\n\n    inputs = [\n        MessageTextInput(\n            name=\"jira_instance\",\n            display_name=\"Jira Instance URL\",\n            value=\"\",\n            info=\"The URL of your Jira instance (e.g., https://your-domain.atlassian.net)\",\n        ),\n        SecretStrInput(\n            name=\"api_token\",\n            display_name=\"API Token\",\n            value=\"\",\n            info=\"Your Jira API token\",\n            password=True,\n        ),\n        MessageTextInput(\n            name=\"username\",\n            display_name=\"Username/Email\",\n            value=\"\",\n            info=\"Your Jira username or email\",\n        ),\n        DropdownInput(\n            name=\"search_type\",\n            display_name=\"Search Type\",\n            options=[\"jql\", \"text\", \"key\", \"specific_id\", \"assignee\", \"reporter\", \"status\", \"all\"],\n            value=\"all\",\n            info=\"The type of search to perform\",\n        ),\n        IntInput(\n            name=\"max_results\",\n            display_name=\"Maximum Results\",\n            value=10,\n            info=\"Maximum number of results to return\",\n        ),\n        BoolInput(\n            name=\"include_comments\",\n            display_name=\"Include Comments\",\n            value=False,\n            info=\"Include ticket comments in the results\",\n        ),\n        BoolInput(\n            name=\"include_attachments\",\n            display_name=\"List Attachments\",\n            value=False,\n            info=\"Include attachment information in the results\",\n            advanced=True,\n        ),\n    ]\n\n    def _search_by_jql(self, jql_query: str) -> List[Dict]:\n        \"\"\"Search tickets using JQL (Jira Query Language).\"\"\"\n        url = f\"{self.jira_instance}/rest/api/2/search\"\n        params = {\n            \"jql\": jql_query,\n            \"maxResults\": self.max_results\n        }\n        response = self._make_request(url, params=params)\n        return self._process_search_results(response.get(\"issues\", []))\n\n    def _search_by_text(self, text: str) -> List[Dict]:\n        \"\"\"Search tickets containing specific text.\"\"\"\n        jql_query = f'text ~ \"{text}\"'\n        return self._search_by_jql(jql_query)\n\n    def _search_by_key(self, key: str) -> List[Dict]:\n        \"\"\"Search for a specific ticket by its key.\"\"\"\n        # Clean up the key to handle potential formatting issues\n        key = key.strip().upper()\n\n        # First try direct ticket lookup\n        url = f\"{self.jira_instance}/rest/api/2/issue/{key}\"\n        try:\n            response = self._make_request(url)\n            return [self._process_ticket(response)]\n        except Exception as e:\n            logger.warning(f\"Direct ticket lookup failed: {e}\")\n            # Fall back to JQL search\n            jql_query = f'key = \"{key}\"'\n            return self._search_by_jql(jql_query)\n\n    def _search_by_specific_id(self, ticket_id: str) -> List[Dict]:\n        \"\"\"Search for a specific ticket by ID like OAPI-10686.\"\"\"\n        # Ensure the ticket ID is properly formatted\n        ticket_id = ticket_id.strip().upper()\n\n        # Get the ticket directly by its key\n        return self._search_by_key(ticket_id)\n\n    def _search_by_assignee(self, assignee: str) -> List[Dict]:\n        \"\"\"Search tickets assigned to a specific user.\"\"\"\n        jql_query = f'assignee = \"{assignee}\"'\n        return self._search_by_jql(jql_query)\n\n    def _search_by_reporter(self, reporter: str) -> List[Dict]:\n        \"\"\"Search tickets reported by a specific user.\"\"\"\n        jql_query = f'reporter = \"{reporter}\"'\n        return self._search_by_jql(jql_query)\n\n    def _search_by_status(self, status: str) -> List[Dict]:\n        \"\"\"Search tickets with a specific status.\"\"\"\n        jql_query = f'status = \"{status}\"'\n        return self._search_by_jql(jql_query)\n\n    def _make_request(self, url: str, params: Dict = None) -> Dict:\n        \"\"\"Make an authenticated request to the Jira API.\"\"\"\n        headers = {\n            \"Accept\": \"application/json\",\n            \"Content-Type\": \"application/json\"\n        }\n\n        response = requests.get(\n            url,\n            auth=(self.username, self.api_token),\n            headers=headers,\n            params=params\n        )\n\n        if response.status_code != 200:\n            raise ValueError(f\"Jira API request failed: {response.status_code} - {response.text}\")\n\n        return response.json()\n\n    def _get_comments(self, ticket_key: str) -> List[Dict]:\n        \"\"\"Get comments for a specific ticket.\"\"\"\n        if not self.include_comments:\n            return []\n\n        url = f\"{self.jira_instance}/rest/api/2/issue/{ticket_key}/comment\"\n        response = self._make_request(url)\n\n        comments = []\n        for comment in response.get(\"comments\", []):\n            comments.append({\n                \"author\": comment.get(\"author\", {}).get(\"displayName\", \"Unknown\"),\n                \"created\": comment.get(\"created\"),\n                \"body\": comment.get(\"body\")\n            })\n\n        return comments\n\n    def _get_attachments(self, ticket_key: str) -> List[Dict]:\n        \"\"\"Get attachment information for a specific ticket.\"\"\"\n        if not self.include_attachments:\n            return []\n\n        url = f\"{self.jira_instance}/rest/api/2/issue/{ticket_key}\"\n        response = self._make_request(url)\n\n        attachments = []\n        for attachment in response.get(\"fields\", {}).get(\"attachment\", []):\n            attachments.append({\n                \"filename\": attachment.get(\"filename\"),\n                \"size\": attachment.get(\"size\"),\n                \"created\": attachment.get(\"created\"),\n                \"url\": attachment.get(\"content\")\n            })\n\n        return attachments\n\n    def _process_ticket(self, ticket: Dict) -> Dict:\n        \"\"\"Process a ticket to extract relevant information.\"\"\"\n        ticket_key = ticket.get(\"key\")\n        fields = ticket.get(\"fields\", {})\n\n        processed_ticket = {\n            \"key\": ticket_key,\n            \"summary\": fields.get(\"summary\"),\n            \"description\": fields.get(\"description\"),\n            \"status\": fields.get(\"status\", {}).get(\"name\"),\n            \"priority\": fields.get(\"priority\", {}).get(\"name\"),\n            \"assignee\": fields.get(\"assignee\", {}).get(\"displayName\") if fields.get(\"assignee\") else \"Unassigned\",\n            \"reporter\": fields.get(\"reporter\", {}).get(\"displayName\") if fields.get(\"reporter\") else \"Unknown\",\n            \"created\": fields.get(\"created\"),\n            \"updated\": fields.get(\"updated\"),\n            \"url\": f\"{self.jira_instance}/browse/{ticket_key}\"\n        }\n\n        if self.include_comments:\n            processed_ticket[\"comments\"] = self._get_comments(ticket_key)\n\n        if self.include_attachments:\n            processed_ticket[\"attachments\"] = self._get_attachments(ticket_key)\n\n        return processed_ticket\n\n    def _process_search_results(self, issues: List[Dict]) -> List[Dict]:\n        \"\"\"Process search results to extract relevant information.\"\"\"\n        processed_results = []\n\n        for issue in issues:\n            processed_results.append(self._process_ticket(issue))\n\n        return processed_results\n\n    def _format_search_results(self, results: List[Dict]) -> str:\n        \"\"\"Format search results as a readable string.\"\"\"\n        if not results:\n            return \"No tickets found.\"\n\n        formatted_results = []\n\n        for ticket in results:\n            ticket_info = [\n                f\"Key: {ticket['key']}\",\n                f\"Summary: {ticket['summary']}\",\n                f\"Status: {ticket['status']}\",\n                f\"Assignee: {ticket['assignee']}\",\n                f\"Reporter: {ticket['reporter']}\",\n                f\"URL: {ticket['url']}\"\n            ]\n\n            if self.include_comments and ticket.get(\"comments\"):\n                comments_info = [\"Comments:\"]\n                for comment in ticket[\"comments\"]:\n                    comments_info.append(f\"  - {comment['author']} ({comment['created']}): {comment['body'][:100]}...\")\n                ticket_info.append(\"\\n\".join(comments_info))\n\n            if self.include_attachments and ticket.get(\"attachments\"):\n                attachments_info = [\"Attachments:\"]\n                for attachment in ticket[\"attachments\"]:\n                    attachments_info.append(f\"  - {attachment['filename']} ({attachment['size']} bytes)\")\n                ticket_info.append(\"\\n\".join(attachments_info))\n\n            formatted_results.append(\"\\n\".join(ticket_info))\n\n        return \"\\n\\n\".join(formatted_results)\n\n    def build_tool(self) -> Sequence[Tool]:\n        \"\"\"Build and return Jira search tools based on selected search type.\"\"\"\n        tools = []\n\n        if self.search_type in [\"jql\", \"all\"]:\n            tools.append(\n                Tool(\n                    name=\"Jira_Search_JQL\",\n                    description=\"Search Jira tickets using JQL (Jira Query Language). Input should be a valid JQL query string.\",\n                    func=lambda input_str: self._format_search_results(\n                        self._search_by_jql(input_str.strip())\n                    ),\n                )\n            )\n\n        if self.search_type in [\"text\", \"all\"]:\n            tools.append(\n                Tool(\n                    name=\"Jira_Search_Text\",\n                    description=\"Search Jira tickets containing specific text. Input should be the text to search for.\",\n                    func=lambda input_str: self._format_search_results(\n                        self._search_by_text(input_str.strip())\n                    ),\n                )\n            )\n\n        if self.search_type in [\"key\", \"all\"]:\n            tools.append(\n                Tool(\n                    name=\"Jira_Search_Key\",\n                    description=\"Search for a specific Jira ticket by its key (e.g., PROJECT-123).\",\n                    func=lambda input_str: self._format_search_results(\n                        self._search_by_key(input_str.strip())\n                    ),\n                )\n            )\n\n        if self.search_type in [\"specific_id\", \"all\"]:\n            tools.append(\n                Tool(\n                    name=\"Jira_Search_Specific_ID\",\n                    description=\"Search for a specific Jira ticket by its ID (e.g., OAPI-10686).\",\n                    func=lambda input_str: self._format_search_results(\n                        self._search_by_specific_id(input_str.strip())\n                    ),\n                )\n            )\n\n        if self.search_type in [\"assignee\", \"all\"]:\n            tools.append(\n                Tool(\n                    name=\"Jira_Search_Assignee\",\n                    description=\"Search Jira tickets assigned to a specific user. Input should be the username or email.\",\n                    func=lambda input_str: self._format_search_results(\n                        self._search_by_assignee(input_str.strip())\n                    ),\n                )\n            )\n\n        if self.search_type in [\"reporter\", \"all\"]:\n            tools.append(\n                Tool(\n                    name=\"Jira_Search_Reporter\",\n                    description=\"Search Jira tickets reported by a specific user. Input should be the username or email.\",\n                    func=lambda input_str: self._format_search_results(\n                        self._search_by_reporter(input_str.strip())\n                    ),\n                )\n            )\n\n        if self.search_type in [\"status\", \"all\"]:\n            tools.append(\n                Tool(\n                    name=\"Jira_Search_Status\",\n                    description=\"Search Jira tickets with a specific status. Input should be the status name (e.g., 'In Progress', 'Done').\",\n                    func=lambda input_str: self._format_search_results(\n                        self._search_by_status(input_str.strip())\n                    ),\n                )\n            )\n\n        return tools\n\n    def update_build_config(self, build_config: dict, field_value: Any, field_name: str | None = None) -> dict:\n        \"\"\"Update build configuration based on field changes.\"\"\"\n        # No dynamic updates needed for this component\n        return build_config",
+                "fileTypes": [],
+                "file_path": "",
+                "password": false,
+                "name": "code",
+                "advanced": true,
+                "dynamic": true,
+                "info": "",
+                "load_from_db": false,
+                "title_case": false
+              },
+              "include_attachments": {
+                "trace_as_metadata": true,
+                "list": false,
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "include_attachments",
+                "value": false,
+                "display_name": "List Attachments",
+                "advanced": true,
+                "dynamic": false,
+                "info": "Include attachment information in the results",
+                "title_case": false,
+                "type": "bool",
+                "_input_type": "BoolInput"
+              },
+              "include_comments": {
+                "trace_as_metadata": true,
+                "list": false,
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "include_comments",
+                "value": false,
+                "display_name": "Include Comments",
+                "advanced": false,
+                "dynamic": false,
+                "info": "Include ticket comments in the results",
+                "title_case": false,
+                "type": "bool",
+                "_input_type": "BoolInput"
+              },
+              "jira_instance": {
+                "trace_as_input": true,
+                "trace_as_metadata": true,
+                "load_from_db": false,
+                "list": false,
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "jira_instance",
+                "value": "https://ktbinnovation.atlassian.net/",
+                "display_name": "Jira Instance URL",
+                "advanced": false,
+                "input_types": [
+                  "Message"
+                ],
+                "dynamic": false,
+                "info": "The URL of your Jira instance (e.g., https://your-domain.atlassian.net)",
+                "title_case": false,
+                "type": "str",
+                "_input_type": "MessageTextInput"
+              },
+              "max_results": {
+                "trace_as_metadata": true,
+                "list": false,
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "max_results",
+                "value": 10,
+                "display_name": "Maximum Results",
+                "advanced": false,
+                "dynamic": false,
+                "info": "Maximum number of results to return",
+                "title_case": false,
+                "type": "int",
+                "_input_type": "IntInput"
+              },
+              "search_type": {
+                "trace_as_metadata": true,
+                "options": [
+                  "jql",
+                  "text",
+                  "key",
+                  "specific_id",
+                  "assignee",
+                  "reporter",
+                  "status",
+                  "all"
+                ],
+                "combobox": false,
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "search_type",
+                "value": "all",
+                "display_name": "Search Type",
+                "advanced": false,
+                "dynamic": false,
+                "info": "The type of search to perform",
+                "title_case": false,
+                "type": "str",
+                "_input_type": "DropdownInput"
+              },
+              "username": {
+                "trace_as_input": true,
+                "trace_as_metadata": true,
+                "load_from_db": false,
+                "list": false,
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "username",
+                "value": "chinnawat.p@arise.tech",
+                "display_name": "Username/Email",
+                "advanced": false,
+                "input_types": [
+                  "Message"
+                ],
+                "dynamic": false,
+                "info": "Your Jira username or email",
+                "title_case": false,
+                "type": "str",
+                "_input_type": "MessageTextInput"
+              }
+            },
+            "description": "Search tickets in Jira based on various criteria",
+            "icon": "Jira",
+            "base_classes": [
+              "Data",
+              "Tool"
+            ],
+            "display_name": "Jira Query",
+            "documentation": "https://docs.langflow.org",
+            "custom_fields": {},
+            "output_types": [],
+            "pinned": false,
+            "conditional_paths": [],
+            "frozen": false,
+            "outputs": [
+              {
+                "types": [
+                  "Data"
+                ],
+                "selected": "Data",
+                "name": "api_run_model",
+                "display_name": "Data",
+                "method": "run_model",
+                "value": "__UNDEFINED__",
+                "cache": true
+              },
+              {
+                "types": [
+                  "Tool"
+                ],
+                "selected": "Tool",
+                "name": "api_build_tool",
+                "display_name": "Tool",
+                "method": "build_tool",
+                "value": "__UNDEFINED__",
+                "cache": true
+              }
+            ],
+            "field_order": [
+              "jira_instance",
+              "api_token",
+              "username",
+              "search_type",
+              "max_results",
+              "include_comments",
+              "include_attachments"
+            ],
+            "beta": false,
+            "edited": true,
+            "lf_version": "1.2.0"
+          },
+          "id": "JiraSearchTickets-qrfGh"
+        },
+        "selected": false,
+        "measured": {
+          "width": 320,
+          "height": 647
+        },
+        "dragging": false
+      },
+      {
+        "id": "SequentialTaskComponent-VPtWu",
+        "type": "genericNode",
+        "position": {
+          "x": 1360.067387249455,
+          "y": 784.5438575238175
+        },
+        "data": {
+          "node": {
+            "template": {
+              "_type": "Component",
+              "agent": {
+                "trace_as_metadata": true,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": true,
+                "placeholder": "",
+                "show": true,
+                "name": "agent",
+                "value": "",
+                "display_name": "Agent",
+                "advanced": false,
+                "input_types": [
+                  "Agent"
+                ],
+                "dynamic": false,
+                "info": "CrewAI Agent that will perform the task",
+                "title_case": false,
+                "type": "other",
+                "_input_type": "HandleInput"
+              },
+              "task": {
+                "trace_as_metadata": true,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "task",
+                "value": "",
+                "display_name": "Task",
+                "advanced": false,
+                "input_types": [
+                  "SequentialTask"
+                ],
+                "dynamic": false,
+                "info": "CrewAI Task that will perform the task",
+                "title_case": false,
+                "type": "other",
+                "_input_type": "HandleInput"
+              },
+              "tools": {
+                "trace_as_metadata": true,
+                "list": true,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "tools",
+                "value": "",
+                "display_name": "Tools",
+                "advanced": true,
+                "input_types": [
+                  "Tool"
+                ],
+                "dynamic": false,
+                "info": "List of tools/resources limited for task execution. Uses the Agent tools by default.",
+                "title_case": false,
+                "type": "other",
+                "_input_type": "HandleInput"
+              },
+              "async_execution": {
+                "tool_mode": false,
+                "trace_as_metadata": true,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "async_execution",
+                "value": true,
+                "display_name": "Async Execution",
+                "advanced": true,
+                "dynamic": false,
+                "info": "Boolean flag indicating asynchronous task execution.",
+                "title_case": false,
+                "type": "bool",
+                "_input_type": "BoolInput"
+              },
+              "code": {
+                "type": "code",
+                "required": true,
+                "placeholder": "",
+                "list": false,
+                "show": true,
+                "multiline": true,
+                "value": "from langflow.base.agents.crewai.tasks import SequentialTask\nfrom langflow.custom import Component\nfrom langflow.io import BoolInput, HandleInput, MultilineInput, Output\n\n\nclass SequentialTaskComponent(Component):\n    display_name: str = \"Sequential Task\"\n    description: str = \"Each task must have a description, an expected output and an agent responsible for execution.\"\n    icon = \"CrewAI\"\n    inputs = [\n        MultilineInput(\n            name=\"task_description\",\n            display_name=\"Description\",\n            info=\"Descriptive text detailing task's purpose and execution.\",\n        ),\n        MultilineInput(\n            name=\"expected_output\",\n            display_name=\"Expected Output\",\n            info=\"Clear definition of expected task outcome.\",\n        ),\n        HandleInput(\n            name=\"tools\",\n            display_name=\"Tools\",\n            input_types=[\"Tool\"],\n            is_list=True,\n            info=\"List of tools/resources limited for task execution. Uses the Agent tools by default.\",\n            required=False,\n            advanced=True,\n        ),\n        HandleInput(\n            name=\"agent\",\n            display_name=\"Agent\",\n            input_types=[\"Agent\"],\n            info=\"CrewAI Agent that will perform the task\",\n            required=True,\n        ),\n        HandleInput(\n            name=\"task\",\n            display_name=\"Task\",\n            input_types=[\"SequentialTask\"],\n            info=\"CrewAI Task that will perform the task\",\n        ),\n        BoolInput(\n            name=\"async_execution\",\n            display_name=\"Async Execution\",\n            value=True,\n            advanced=True,\n            info=\"Boolean flag indicating asynchronous task execution.\",\n        ),\n    ]\n\n    outputs = [\n        Output(display_name=\"Task\", name=\"task_output\", method=\"build_task\"),\n    ]\n\n    def build_task(self) -> list[SequentialTask]:\n        tasks: list[SequentialTask] = []\n        task = SequentialTask(\n            description=self.task_description,\n            expected_output=self.expected_output,\n            tools=self.agent.tools,\n            async_execution=False,\n            agent=self.agent,\n        )\n        tasks.append(task)\n        self.status = task\n        if self.task:\n            if isinstance(self.task, list) and all(isinstance(task, SequentialTask) for task in self.task):\n                tasks = self.task + tasks\n            elif isinstance(self.task, SequentialTask):\n                tasks = [self.task, *tasks]\n        return tasks\n",
+                "fileTypes": [],
+                "file_path": "",
+                "password": false,
+                "name": "code",
+                "advanced": true,
+                "dynamic": true,
+                "info": "",
+                "load_from_db": false,
+                "title_case": false
+              },
+              "expected_output": {
+                "tool_mode": false,
+                "trace_as_input": true,
+                "multiline": true,
+                "trace_as_metadata": true,
+                "load_from_db": false,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "expected_output",
+                "value": "",
+                "display_name": "Expected Output",
+                "advanced": false,
+                "input_types": [
+                  "Message"
+                ],
+                "dynamic": false,
+                "info": "Clear definition of expected task outcome.",
+                "title_case": false,
+                "type": "str",
+                "_input_type": "MultilineInput"
+              },
+              "task_description": {
+                "tool_mode": false,
+                "trace_as_input": true,
+                "multiline": true,
+                "trace_as_metadata": true,
+                "load_from_db": false,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "task_description",
+                "value": "",
+                "display_name": "Description",
+                "advanced": false,
+                "input_types": [
+                  "Message"
+                ],
+                "dynamic": false,
+                "info": "Descriptive text detailing task's purpose and execution.",
+                "title_case": false,
+                "type": "str",
+                "_input_type": "MultilineInput"
+              }
+            },
+            "description": "Each task must have a description, an expected output and an agent responsible for execution.",
+            "icon": "CrewAI",
+            "base_classes": [
+              "SequentialTask"
+            ],
+            "display_name": "Sequential Task",
+            "documentation": "",
+            "minimized": false,
+            "custom_fields": {},
+            "output_types": [],
+            "pinned": false,
+            "conditional_paths": [],
+            "frozen": false,
+            "outputs": [
+              {
+                "types": [
+                  "SequentialTask"
+                ],
+                "selected": "SequentialTask",
+                "name": "task_output",
+                "display_name": "Task",
+                "method": "build_task",
+                "value": "__UNDEFINED__",
+                "cache": true,
+                "allows_loop": false,
+                "tool_mode": true
+              }
+            ],
+            "field_order": [
+              "task_description",
+              "expected_output",
+              "tools",
+              "agent",
+              "task",
+              "async_execution"
+            ],
+            "beta": false,
+            "legacy": false,
+            "edited": false,
+            "metadata": {},
+            "tool_mode": false,
+            "lf_version": "1.2.0"
+          },
+          "showNode": true,
+          "type": "SequentialTaskComponent",
+          "id": "SequentialTaskComponent-VPtWu"
+        },
+        "selected": false,
+        "measured": {
+          "width": 320,
+          "height": 439
+        }
+      },
+      {
+        "id": "CrewAIAgentComponent-AAk3k",
+        "type": "genericNode",
+        "position": {
+          "x": 901.319965322296,
+          "y": 1074.5537064886041
+        },
+        "data": {
+          "node": {
+            "template": {
+              "_type": "Component",
+              "llm": {
+                "trace_as_metadata": true,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "llm",
+                "value": "",
+                "display_name": "Language Model",
+                "advanced": false,
+                "input_types": [
+                  "LanguageModel"
+                ],
+                "dynamic": false,
+                "info": "Language model that will run the agent.",
+                "title_case": false,
+                "type": "other",
+                "_input_type": "HandleInput"
+              },
+              "tools": {
+                "trace_as_metadata": true,
+                "list": true,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "tools",
+                "value": [],
+                "display_name": "Tools",
+                "advanced": false,
+                "input_types": [
+                  "Tool"
+                ],
+                "dynamic": false,
+                "info": "Tools at agents disposal",
+                "title_case": false,
+                "type": "other",
+                "_input_type": "HandleInput"
+              },
+              "allow_code_execution": {
+                "tool_mode": false,
+                "trace_as_metadata": true,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "allow_code_execution",
+                "value": false,
+                "display_name": "Allow Code Execution",
+                "advanced": true,
+                "dynamic": false,
+                "info": "Whether the agent is allowed to execute code.",
+                "title_case": false,
+                "type": "bool",
+                "_input_type": "BoolInput"
+              },
+              "allow_delegation": {
+                "tool_mode": false,
+                "trace_as_metadata": true,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "allow_delegation",
+                "value": false,
+                "display_name": "Allow Delegation",
+                "advanced": false,
+                "dynamic": false,
+                "info": "Whether the agent is allowed to delegate tasks to other agents.",
+                "title_case": false,
+                "type": "bool",
+                "_input_type": "BoolInput"
+              },
+              "backstory": {
+                "tool_mode": false,
+                "trace_as_input": true,
+                "multiline": true,
+                "trace_as_metadata": true,
+                "load_from_db": false,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "backstory",
+                "value": "You are an expert in Jira administration and best practices, helping teams organize their work effectively. You understand all the nuances of Jira configuration, automation, and reporting to ensure teams can track their work with minimal friction.",
+                "display_name": "Backstory",
+                "advanced": false,
+                "input_types": [
+                  "Message"
+                ],
+                "dynamic": false,
+                "info": "The backstory of the agent.",
+                "title_case": false,
+                "type": "str",
+                "_input_type": "MultilineInput"
+              },
+              "code": {
+                "type": "code",
+                "required": true,
+                "placeholder": "",
+                "list": false,
+                "show": true,
+                "multiline": true,
+                "value": "from crewai import Agent\n\nfrom langflow.base.agents.crewai.crew import convert_llm, convert_tools\nfrom langflow.custom import Component\nfrom langflow.io import BoolInput, DictInput, HandleInput, MultilineInput, Output\n\n\nclass CrewAIAgentComponent(Component):\n    \"\"\"Component for creating a CrewAI agent.\n\n    This component allows you to create a CrewAI agent with the specified role, goal, backstory, tools,\n    and language model.\n\n    Args:\n        Component (Component): Base class for all components.\n\n    Returns:\n        Agent: CrewAI agent.\n    \"\"\"\n\n    display_name = \"CrewAI Agent\"\n    description = \"Represents an agent of CrewAI.\"\n    documentation: str = \"https://docs.crewai.com/how-to/LLM-Connections/\"\n    icon = \"CrewAI\"\n\n    inputs = [\n        MultilineInput(name=\"role\", display_name=\"Role\", info=\"The role of the agent.\"),\n        MultilineInput(name=\"goal\", display_name=\"Goal\", info=\"The objective of the agent.\"),\n        MultilineInput(name=\"backstory\", display_name=\"Backstory\", info=\"The backstory of the agent.\"),\n        HandleInput(\n            name=\"tools\",\n            display_name=\"Tools\",\n            input_types=[\"Tool\"],\n            is_list=True,\n            info=\"Tools at agents disposal\",\n            value=[],\n        ),\n        HandleInput(\n            name=\"llm\",\n            display_name=\"Language Model\",\n            info=\"Language model that will run the agent.\",\n            input_types=[\"LanguageModel\"],\n        ),\n        BoolInput(\n            name=\"memory\",\n            display_name=\"Memory\",\n            info=\"Whether the agent should have memory or not\",\n            advanced=True,\n            value=True,\n        ),\n        BoolInput(\n            name=\"verbose\",\n            display_name=\"Verbose\",\n            advanced=True,\n            value=False,\n        ),\n        BoolInput(\n            name=\"allow_delegation\",\n            display_name=\"Allow Delegation\",\n            info=\"Whether the agent is allowed to delegate tasks to other agents.\",\n            value=True,\n        ),\n        BoolInput(\n            name=\"allow_code_execution\",\n            display_name=\"Allow Code Execution\",\n            info=\"Whether the agent is allowed to execute code.\",\n            value=False,\n            advanced=True,\n        ),\n        DictInput(\n            name=\"kwargs\",\n            display_name=\"kwargs\",\n            info=\"kwargs of agent.\",\n            is_list=True,\n            advanced=True,\n        ),\n    ]\n\n    outputs = [\n        Output(display_name=\"Agent\", name=\"output\", method=\"build_output\"),\n    ]\n\n    def build_output(self) -> Agent:\n        kwargs = self.kwargs or {}\n\n        # Define the Agent\n        agent = Agent(\n            role=self.role,\n            goal=self.goal,\n            backstory=self.backstory,\n            llm=convert_llm(self.llm),\n            verbose=self.verbose,\n            memory=self.memory,\n            tools=convert_tools(self.tools),\n            allow_delegation=self.allow_delegation,\n            allow_code_execution=self.allow_code_execution,\n            **kwargs,\n        )\n\n        self.status = repr(agent)\n\n        return agent\n",
+                "fileTypes": [],
+                "file_path": "",
+                "password": false,
+                "name": "code",
+                "advanced": true,
+                "dynamic": true,
+                "info": "",
+                "load_from_db": false,
+                "title_case": false
+              },
+              "goal": {
+                "tool_mode": false,
+                "trace_as_input": true,
+                "multiline": true,
+                "trace_as_metadata": true,
+                "load_from_db": false,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "goal",
+                "value": "Manage and optimize project workflows using Jira to improve team productivity and visibility",
+                "display_name": "Goal",
+                "advanced": false,
+                "input_types": [
+                  "Message"
+                ],
+                "dynamic": false,
+                "info": "The objective of the agent.",
+                "title_case": false,
+                "type": "str",
+                "_input_type": "MultilineInput"
+              },
+              "kwargs": {
+                "tool_mode": false,
+                "trace_as_input": true,
+                "list": true,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "kwargs",
+                "value": {},
+                "display_name": "kwargs",
+                "advanced": true,
+                "dynamic": false,
+                "info": "kwargs of agent.",
+                "title_case": false,
+                "type": "dict",
+                "_input_type": "DictInput"
+              },
+              "memory": {
+                "tool_mode": false,
+                "trace_as_metadata": true,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "memory",
+                "value": true,
+                "display_name": "Memory",
+                "advanced": true,
+                "dynamic": false,
+                "info": "Whether the agent should have memory or not",
+                "title_case": false,
+                "type": "bool",
+                "_input_type": "BoolInput"
+              },
+              "role": {
+                "tool_mode": false,
+                "trace_as_input": true,
+                "multiline": true,
+                "trace_as_metadata": true,
+                "load_from_db": false,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "role",
+                "value": "Jira Specialist",
+                "display_name": "Role",
+                "advanced": false,
+                "input_types": [
+                  "Message"
+                ],
+                "dynamic": false,
+                "info": "The role of the agent.",
+                "title_case": false,
+                "type": "str",
+                "_input_type": "MultilineInput"
+              },
+              "verbose": {
+                "tool_mode": false,
+                "trace_as_metadata": true,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "verbose",
+                "value": false,
+                "display_name": "Verbose",
+                "advanced": true,
+                "dynamic": false,
+                "info": "",
+                "title_case": false,
+                "type": "bool",
+                "_input_type": "BoolInput"
+              }
+            },
+            "description": "Represents an agent of CrewAI.",
+            "icon": "CrewAI",
+            "base_classes": [
+              "Agent"
+            ],
+            "display_name": "CrewAI Agent",
+            "documentation": "https://docs.crewai.com/how-to/LLM-Connections/",
+            "minimized": false,
+            "custom_fields": {},
+            "output_types": [],
+            "pinned": false,
+            "conditional_paths": [],
+            "frozen": false,
+            "outputs": [
+              {
+                "types": [
+                  "Agent"
+                ],
+                "selected": "Agent",
+                "name": "output",
+                "display_name": "Agent",
+                "method": "build_output",
+                "value": "__UNDEFINED__",
+                "cache": true,
+                "allows_loop": false,
+                "tool_mode": true
+              }
+            ],
+            "field_order": [
+              "role",
+              "goal",
+              "backstory",
+              "tools",
+              "llm",
+              "memory",
+              "verbose",
+              "allow_delegation",
+              "allow_code_execution",
+              "kwargs"
+            ],
+            "beta": false,
+            "legacy": false,
+            "edited": false,
+            "metadata": {},
+            "tool_mode": false,
+            "lf_version": "1.2.0"
+          },
+          "showNode": true,
+          "type": "CrewAIAgentComponent",
+          "id": "CrewAIAgentComponent-AAk3k"
+        },
+        "selected": false,
+        "measured": {
+          "width": 320,
+          "height": 523
+        }
+      },
+      {
+        "id": "SequentialTaskComponent-gxHtm",
+        "type": "genericNode",
+        "position": {
+          "x": 1922.3688700526518,
+          "y": 761.9505588689426
+        },
+        "data": {
+          "node": {
+            "template": {
+              "_type": "Component",
+              "agent": {
+                "trace_as_metadata": true,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": true,
+                "placeholder": "",
+                "show": true,
+                "name": "agent",
+                "value": "",
+                "display_name": "Agent",
+                "advanced": false,
+                "input_types": [
+                  "Agent"
+                ],
+                "dynamic": false,
+                "info": "CrewAI Agent that will perform the task",
+                "title_case": false,
+                "type": "other",
+                "_input_type": "HandleInput"
+              },
+              "task": {
+                "trace_as_metadata": true,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "task",
+                "value": "",
+                "display_name": "Task",
+                "advanced": false,
+                "input_types": [
+                  "SequentialTask"
+                ],
+                "dynamic": false,
+                "info": "CrewAI Task that will perform the task",
+                "title_case": false,
+                "type": "other",
+                "_input_type": "HandleInput"
+              },
+              "tools": {
+                "trace_as_metadata": true,
+                "list": true,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "tools",
+                "value": "",
+                "display_name": "Tools",
+                "advanced": true,
+                "input_types": [
+                  "Tool"
+                ],
+                "dynamic": false,
+                "info": "List of tools/resources limited for task execution. Uses the Agent tools by default.",
+                "title_case": false,
+                "type": "other",
+                "_input_type": "HandleInput"
+              },
+              "async_execution": {
+                "tool_mode": false,
+                "trace_as_metadata": true,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "async_execution",
+                "value": true,
+                "display_name": "Async Execution",
+                "advanced": true,
+                "dynamic": false,
+                "info": "Boolean flag indicating asynchronous task execution.",
+                "title_case": false,
+                "type": "bool",
+                "_input_type": "BoolInput"
+              },
+              "code": {
+                "type": "code",
+                "required": true,
+                "placeholder": "",
+                "list": false,
+                "show": true,
+                "multiline": true,
+                "value": "from langflow.base.agents.crewai.tasks import SequentialTask\nfrom langflow.custom import Component\nfrom langflow.io import BoolInput, HandleInput, MultilineInput, Output\n\n\nclass SequentialTaskComponent(Component):\n    display_name: str = \"Sequential Task\"\n    description: str = \"Each task must have a description, an expected output and an agent responsible for execution.\"\n    icon = \"CrewAI\"\n    inputs = [\n        MultilineInput(\n            name=\"task_description\",\n            display_name=\"Description\",\n            info=\"Descriptive text detailing task's purpose and execution.\",\n        ),\n        MultilineInput(\n            name=\"expected_output\",\n            display_name=\"Expected Output\",\n            info=\"Clear definition of expected task outcome.\",\n        ),\n        HandleInput(\n            name=\"tools\",\n            display_name=\"Tools\",\n            input_types=[\"Tool\"],\n            is_list=True,\n            info=\"List of tools/resources limited for task execution. Uses the Agent tools by default.\",\n            required=False,\n            advanced=True,\n        ),\n        HandleInput(\n            name=\"agent\",\n            display_name=\"Agent\",\n            input_types=[\"Agent\"],\n            info=\"CrewAI Agent that will perform the task\",\n            required=True,\n        ),\n        HandleInput(\n            name=\"task\",\n            display_name=\"Task\",\n            input_types=[\"SequentialTask\"],\n            info=\"CrewAI Task that will perform the task\",\n        ),\n        BoolInput(\n            name=\"async_execution\",\n            display_name=\"Async Execution\",\n            value=True,\n            advanced=True,\n            info=\"Boolean flag indicating asynchronous task execution.\",\n        ),\n    ]\n\n    outputs = [\n        Output(display_name=\"Task\", name=\"task_output\", method=\"build_task\"),\n    ]\n\n    def build_task(self) -> list[SequentialTask]:\n        tasks: list[SequentialTask] = []\n        task = SequentialTask(\n            description=self.task_description,\n            expected_output=self.expected_output,\n            tools=self.agent.tools,\n            async_execution=False,\n            agent=self.agent,\n        )\n        tasks.append(task)\n        self.status = task\n        if self.task:\n            if isinstance(self.task, list) and all(isinstance(task, SequentialTask) for task in self.task):\n                tasks = self.task + tasks\n            elif isinstance(self.task, SequentialTask):\n                tasks = [self.task, *tasks]\n        return tasks\n",
+                "fileTypes": [],
+                "file_path": "",
+                "password": false,
+                "name": "code",
+                "advanced": true,
+                "dynamic": true,
+                "info": "",
+                "load_from_db": false,
+                "title_case": false
+              },
+              "expected_output": {
+                "tool_mode": false,
+                "trace_as_input": true,
+                "multiline": true,
+                "trace_as_metadata": true,
+                "load_from_db": false,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "expected_output",
+                "value": "",
+                "display_name": "Expected Output",
+                "advanced": false,
+                "input_types": [
+                  "Message"
+                ],
+                "dynamic": false,
+                "info": "Clear definition of expected task outcome.",
+                "title_case": false,
+                "type": "str",
+                "_input_type": "MultilineInput"
+              },
+              "task_description": {
+                "tool_mode": false,
+                "trace_as_input": true,
+                "multiline": true,
+                "trace_as_metadata": true,
+                "load_from_db": false,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "task_description",
+                "value": "",
+                "display_name": "Description",
+                "advanced": false,
+                "input_types": [
+                  "Message"
+                ],
+                "dynamic": false,
+                "info": "Descriptive text detailing task's purpose and execution.",
+                "title_case": false,
+                "type": "str",
+                "_input_type": "MultilineInput"
+              }
+            },
+            "description": "Each task must have a description, an expected output and an agent responsible for execution.",
+            "icon": "CrewAI",
+            "base_classes": [
+              "SequentialTask"
+            ],
+            "display_name": "Sequential Task",
+            "documentation": "",
+            "minimized": false,
+            "custom_fields": {},
+            "output_types": [],
+            "pinned": false,
+            "conditional_paths": [],
+            "frozen": false,
+            "outputs": [
+              {
+                "types": [
+                  "SequentialTask"
+                ],
+                "selected": "SequentialTask",
+                "name": "task_output",
+                "display_name": "Task",
+                "method": "build_task",
+                "value": "__UNDEFINED__",
+                "cache": true,
+                "allows_loop": false,
+                "tool_mode": true
+              }
+            ],
+            "field_order": [
+              "task_description",
+              "expected_output",
+              "tools",
+              "agent",
+              "task",
+              "async_execution"
+            ],
+            "beta": false,
+            "legacy": false,
+            "edited": false,
+            "metadata": {},
+            "tool_mode": false,
+            "lf_version": "1.2.0"
+          },
+          "showNode": true,
+          "type": "SequentialTaskComponent",
+          "id": "SequentialTaskComponent-gxHtm"
+        },
+        "selected": false,
+        "measured": {
+          "width": 320,
+          "height": 439
+        }
+      },
+      {
+        "id": "CrewAIAgentComponent-Wng5w",
+        "type": "genericNode",
+        "position": {
+          "x": 1997.2440984314544,
+          "y": 1411.085002643838
+        },
+        "data": {
+          "node": {
+            "template": {
+              "_type": "Component",
+              "llm": {
+                "trace_as_metadata": true,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "llm",
+                "value": "",
+                "display_name": "Language Model",
+                "advanced": false,
+                "input_types": [
+                  "LanguageModel"
+                ],
+                "dynamic": false,
+                "info": "Language model that will run the agent.",
+                "title_case": false,
+                "type": "other",
+                "_input_type": "HandleInput"
+              },
+              "tools": {
+                "trace_as_metadata": true,
+                "list": true,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "tools",
+                "value": [],
+                "display_name": "Tools",
+                "advanced": false,
+                "input_types": [
+                  "Tool"
+                ],
+                "dynamic": false,
+                "info": "Tools at agents disposal",
+                "title_case": false,
+                "type": "other",
+                "_input_type": "HandleInput"
+              },
+              "allow_code_execution": {
+                "tool_mode": false,
+                "trace_as_metadata": true,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "allow_code_execution",
+                "value": false,
+                "display_name": "Allow Code Execution",
+                "advanced": true,
+                "dynamic": false,
+                "info": "Whether the agent is allowed to execute code.",
+                "title_case": false,
+                "type": "bool",
+                "_input_type": "BoolInput"
+              },
+              "allow_delegation": {
+                "tool_mode": false,
+                "trace_as_metadata": true,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "allow_delegation",
+                "value": false,
+                "display_name": "Allow Delegation",
+                "advanced": false,
+                "dynamic": false,
+                "info": "Whether the agent is allowed to delegate tasks to other agents.",
+                "title_case": false,
+                "type": "bool",
+                "_input_type": "BoolInput"
+              },
+              "backstory": {
+                "tool_mode": false,
+                "trace_as_input": true,
+                "multiline": true,
+                "trace_as_metadata": true,
+                "load_from_db": false,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "backstory",
+                "value": "You are specialized in parsing Jira data and transforming it into clear, actionable subtasks. You understand Jira's data structure and can extract meaningful patterns and tasks from tickets, epics, and boards to help teams organize their work.",
+                "display_name": "Backstory",
+                "advanced": false,
+                "input_types": [
+                  "Message"
+                ],
+                "dynamic": false,
+                "info": "The backstory of the agent.",
+                "title_case": false,
+                "type": "str",
+                "_input_type": "MultilineInput"
+              },
+              "code": {
+                "type": "code",
+                "required": true,
+                "placeholder": "",
+                "list": false,
+                "show": true,
+                "multiline": true,
+                "value": "from crewai import Agent\n\nfrom langflow.base.agents.crewai.crew import convert_llm, convert_tools\nfrom langflow.custom import Component\nfrom langflow.io import BoolInput, DictInput, HandleInput, MultilineInput, Output\n\n\nclass CrewAIAgentComponent(Component):\n    \"\"\"Component for creating a CrewAI agent.\n\n    This component allows you to create a CrewAI agent with the specified role, goal, backstory, tools,\n    and language model.\n\n    Args:\n        Component (Component): Base class for all components.\n\n    Returns:\n        Agent: CrewAI agent.\n    \"\"\"\n\n    display_name = \"CrewAI Agent\"\n    description = \"Represents an agent of CrewAI.\"\n    documentation: str = \"https://docs.crewai.com/how-to/LLM-Connections/\"\n    icon = \"CrewAI\"\n\n    inputs = [\n        MultilineInput(name=\"role\", display_name=\"Role\", info=\"The role of the agent.\"),\n        MultilineInput(name=\"goal\", display_name=\"Goal\", info=\"The objective of the agent.\"),\n        MultilineInput(name=\"backstory\", display_name=\"Backstory\", info=\"The backstory of the agent.\"),\n        HandleInput(\n            name=\"tools\",\n            display_name=\"Tools\",\n            input_types=[\"Tool\"],\n            is_list=True,\n            info=\"Tools at agents disposal\",\n            value=[],\n        ),\n        HandleInput(\n            name=\"llm\",\n            display_name=\"Language Model\",\n            info=\"Language model that will run the agent.\",\n            input_types=[\"LanguageModel\"],\n        ),\n        BoolInput(\n            name=\"memory\",\n            display_name=\"Memory\",\n            info=\"Whether the agent should have memory or not\",\n            advanced=True,\n            value=True,\n        ),\n        BoolInput(\n            name=\"verbose\",\n            display_name=\"Verbose\",\n            advanced=True,\n            value=False,\n        ),\n        BoolInput(\n            name=\"allow_delegation\",\n            display_name=\"Allow Delegation\",\n            info=\"Whether the agent is allowed to delegate tasks to other agents.\",\n            value=True,\n        ),\n        BoolInput(\n            name=\"allow_code_execution\",\n            display_name=\"Allow Code Execution\",\n            info=\"Whether the agent is allowed to execute code.\",\n            value=False,\n            advanced=True,\n        ),\n        DictInput(\n            name=\"kwargs\",\n            display_name=\"kwargs\",\n            info=\"kwargs of agent.\",\n            is_list=True,\n            advanced=True,\n        ),\n    ]\n\n    outputs = [\n        Output(display_name=\"Agent\", name=\"output\", method=\"build_output\"),\n    ]\n\n    def build_output(self) -> Agent:\n        kwargs = self.kwargs or {}\n\n        # Define the Agent\n        agent = Agent(\n            role=self.role,\n            goal=self.goal,\n            backstory=self.backstory,\n            llm=convert_llm(self.llm),\n            verbose=self.verbose,\n            memory=self.memory,\n            tools=convert_tools(self.tools),\n            allow_delegation=self.allow_delegation,\n            allow_code_execution=self.allow_code_execution,\n            **kwargs,\n        )\n\n        self.status = repr(agent)\n\n        return agent\n",
+                "fileTypes": [],
+                "file_path": "",
+                "password": false,
+                "name": "code",
+                "advanced": true,
+                "dynamic": true,
+                "info": "",
+                "load_from_db": false,
+                "title_case": false
+              },
+              "goal": {
+                "tool_mode": false,
+                "trace_as_input": true,
+                "multiline": true,
+                "trace_as_metadata": true,
+                "load_from_db": false,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "goal",
+                "value": "Extract and organize Jira data into structured subtasks for team consumption and automation",
+                "display_name": "Goal",
+                "advanced": false,
+                "input_types": [
+                  "Message"
+                ],
+                "dynamic": false,
+                "info": "The objective of the agent.",
+                "title_case": false,
+                "type": "str",
+                "_input_type": "MultilineInput"
+              },
+              "kwargs": {
+                "tool_mode": false,
+                "trace_as_input": true,
+                "list": true,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "kwargs",
+                "value": {},
+                "display_name": "kwargs",
+                "advanced": true,
+                "dynamic": false,
+                "info": "kwargs of agent.",
+                "title_case": false,
+                "type": "dict",
+                "_input_type": "DictInput"
+              },
+              "memory": {
+                "tool_mode": false,
+                "trace_as_metadata": true,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "memory",
+                "value": true,
+                "display_name": "Memory",
+                "advanced": true,
+                "dynamic": false,
+                "info": "Whether the agent should have memory or not",
+                "title_case": false,
+                "type": "bool",
+                "_input_type": "BoolInput"
+              },
+              "role": {
+                "tool_mode": false,
+                "trace_as_input": true,
+                "multiline": true,
+                "trace_as_metadata": true,
+                "load_from_db": false,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "role",
+                "value": "Jira Data Extractor",
+                "display_name": "Role",
+                "advanced": false,
+                "input_types": [
+                  "Message"
+                ],
+                "dynamic": false,
+                "info": "The role of the agent.",
+                "title_case": false,
+                "type": "str",
+                "_input_type": "MultilineInput"
+              },
+              "verbose": {
+                "tool_mode": false,
+                "trace_as_metadata": true,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "verbose",
+                "value": false,
+                "display_name": "Verbose",
+                "advanced": true,
+                "dynamic": false,
+                "info": "",
+                "title_case": false,
+                "type": "bool",
+                "_input_type": "BoolInput"
+              }
+            },
+            "description": "Represents an agent of CrewAI.",
+            "icon": "CrewAI",
+            "base_classes": [
+              "Agent"
+            ],
+            "display_name": "CrewAI Agent",
+            "documentation": "https://docs.crewai.com/how-to/LLM-Connections/",
+            "minimized": false,
+            "custom_fields": {},
+            "output_types": [],
+            "pinned": false,
+            "conditional_paths": [],
+            "frozen": false,
+            "outputs": [
+              {
+                "types": [
+                  "Agent"
+                ],
+                "selected": "Agent",
+                "name": "output",
+                "display_name": "Agent",
+                "method": "build_output",
+                "value": "__UNDEFINED__",
+                "cache": true,
+                "allows_loop": false,
+                "tool_mode": true
+              }
+            ],
+            "field_order": [
+              "role",
+              "goal",
+              "backstory",
+              "tools",
+              "llm",
+              "memory",
+              "verbose",
+              "allow_delegation",
+              "allow_code_execution",
+              "kwargs"
+            ],
+            "beta": false,
+            "legacy": false,
+            "edited": false,
+            "metadata": {},
+            "tool_mode": false,
+            "lf_version": "1.2.0"
+          },
+          "showNode": true,
+          "type": "CrewAIAgentComponent",
+          "id": "CrewAIAgentComponent-Wng5w"
+        },
+        "selected": false,
+        "measured": {
+          "width": 320,
+          "height": 523
+        }
+      }
+    ],
+    "edges": [
+      {
+        "source": "TextInput-GngwV",
+        "target": "Prompt-TOhrY",
+        "sourceHandle": "{œdataTypeœ:œTextInputœ,œidœ:œTextInput-GngwVœ,œnameœ:œtextœ,œoutput_typesœ:[œMessageœ]}",
+        "targetHandle": "{œfieldNameœ:œreq_requestœ,œidœ:œPrompt-TOhrYœ,œinputTypesœ:[œMessageœ],œtypeœ:œstrœ}",
+        "id": "reactflow__edge-TextInput-GngwV{œdataTypeœ:œTextInputœ,œidœ:œTextInput-GngwVœ,œnameœ:œtextœ,œoutput_typesœ:[œMessageœ]}-Prompt-TOhrY{œfieldNameœ:œreq_requestœ,œidœ:œPrompt-TOhrYœ,œinputTypesœ:[œMessageœ],œtypeœ:œstrœ}",
+        "data": {
+          "sourceHandle": {
+            "dataType": "TextInput",
+            "id": "TextInput-GngwV",
+            "name": "text",
+            "output_types": [
+              "Message"
+            ]
+          },
+          "targetHandle": {
+            "fieldName": "req_request",
+            "id": "Prompt-TOhrY",
+            "inputTypes": [
+              "Message"
+            ],
+            "type": "str"
+          }
+        },
+        "selected": false,
+        "className": ""
+      },
+      {
+        "source": "Prompt-TOhrY",
+        "target": "SequentialTaskComponent-VPtWu",
+        "sourceHandle": "{œdataTypeœ:œPromptœ,œidœ:œPrompt-TOhrYœ,œnameœ:œpromptœ,œoutput_typesœ:[œMessageœ]}",
+        "targetHandle": "{œfieldNameœ:œtask_descriptionœ,œidœ:œSequentialTaskComponent-VPtWuœ,œinputTypesœ:[œMessageœ],œtypeœ:œstrœ}",
+        "id": "reactflow__edge-Prompt-TOhrY{œdataTypeœ:œPromptœ,œidœ:œPrompt-TOhrYœ,œnameœ:œpromptœ,œoutput_typesœ:[œMessageœ]}-SequentialTaskComponent-VPtWu{œfieldNameœ:œtask_descriptionœ,œidœ:œSequentialTaskComponent-VPtWuœ,œinputTypesœ:[œMessageœ],œtypeœ:œstrœ}",
+        "data": {
+          "sourceHandle": {
+            "dataType": "Prompt",
+            "id": "Prompt-TOhrY",
+            "name": "prompt",
+            "output_types": [
+              "Message"
+            ]
+          },
+          "targetHandle": {
+            "fieldName": "task_description",
+            "id": "SequentialTaskComponent-VPtWu",
+            "inputTypes": [
+              "Message"
+            ],
+            "type": "str"
+          }
+        },
+        "selected": false,
+        "className": ""
+      },
+      {
+        "source": "CrewAIAgentComponent-AAk3k",
+        "target": "SequentialTaskComponent-VPtWu",
+        "sourceHandle": "{œdataTypeœ:œCrewAIAgentComponentœ,œidœ:œCrewAIAgentComponent-AAk3kœ,œnameœ:œoutputœ,œoutput_typesœ:[œAgentœ]}",
+        "targetHandle": "{œfieldNameœ:œagentœ,œidœ:œSequentialTaskComponent-VPtWuœ,œinputTypesœ:[œAgentœ],œtypeœ:œotherœ}",
+        "id": "reactflow__edge-CrewAIAgentComponent-AAk3k{œdataTypeœ:œCrewAIAgentComponentœ,œidœ:œCrewAIAgentComponent-AAk3kœ,œnameœ:œoutputœ,œoutput_typesœ:[œAgentœ]}-SequentialTaskComponent-VPtWu{œfieldNameœ:œagentœ,œidœ:œSequentialTaskComponent-VPtWuœ,œinputTypesœ:[œAgentœ],œtypeœ:œotherœ}",
+        "data": {
+          "sourceHandle": {
+            "dataType": "CrewAIAgentComponent",
+            "id": "CrewAIAgentComponent-AAk3k",
+            "name": "output",
+            "output_types": [
+              "Agent"
+            ]
+          },
+          "targetHandle": {
+            "fieldName": "agent",
+            "id": "SequentialTaskComponent-VPtWu",
+            "inputTypes": [
+              "Agent"
+            ],
+            "type": "other"
+          }
+        },
+        "selected": false,
+        "className": ""
+      },
+      {
+        "source": "OllamaModel-rcXS4",
+        "target": "CrewAIAgentComponent-AAk3k",
+        "sourceHandle": "{œdataTypeœ:œOllamaModelœ,œidœ:œOllamaModel-rcXS4œ,œnameœ:œmodel_outputœ,œoutput_typesœ:[œLanguageModelœ]}",
+        "targetHandle": "{œfieldNameœ:œllmœ,œidœ:œCrewAIAgentComponent-AAk3kœ,œinputTypesœ:[œLanguageModelœ],œtypeœ:œotherœ}",
+        "id": "reactflow__edge-OllamaModel-rcXS4{œdataTypeœ:œOllamaModelœ,œidœ:œOllamaModel-rcXS4œ,œnameœ:œmodel_outputœ,œoutput_typesœ:[œLanguageModelœ]}-CrewAIAgentComponent-AAk3k{œfieldNameœ:œllmœ,œidœ:œCrewAIAgentComponent-AAk3kœ,œinputTypesœ:[œLanguageModelœ],œtypeœ:œotherœ}",
+        "data": {
+          "sourceHandle": {
+            "dataType": "OllamaModel",
+            "id": "OllamaModel-rcXS4",
+            "name": "model_output",
+            "output_types": [
+              "LanguageModel"
+            ]
+          },
+          "targetHandle": {
+            "fieldName": "llm",
+            "id": "CrewAIAgentComponent-AAk3k",
+            "inputTypes": [
+              "LanguageModel"
+            ],
+            "type": "other"
+          }
+        },
+        "selected": false,
+        "className": ""
+      },
+      {
+        "source": "JiraSearchTickets-qrfGh",
+        "target": "CrewAIAgentComponent-AAk3k",
+        "sourceHandle": "{œdataTypeœ:œJiraSearchTicketsœ,œidœ:œJiraSearchTickets-qrfGhœ,œnameœ:œapi_build_toolœ,œoutput_typesœ:[œToolœ]}",
+        "targetHandle": "{œfieldNameœ:œtoolsœ,œidœ:œCrewAIAgentComponent-AAk3kœ,œinputTypesœ:[œToolœ],œtypeœ:œotherœ}",
+        "id": "reactflow__edge-JiraSearchTickets-qrfGh{œdataTypeœ:œJiraSearchTicketsœ,œidœ:œJiraSearchTickets-qrfGhœ,œnameœ:œapi_build_toolœ,œoutput_typesœ:[œToolœ]}-CrewAIAgentComponent-AAk3k{œfieldNameœ:œtoolsœ,œidœ:œCrewAIAgentComponent-AAk3kœ,œinputTypesœ:[œToolœ],œtypeœ:œotherœ}",
+        "data": {
+          "sourceHandle": {
+            "dataType": "JiraSearchTickets",
+            "id": "JiraSearchTickets-qrfGh",
+            "name": "api_build_tool",
+            "output_types": [
+              "Tool"
+            ]
+          },
+          "targetHandle": {
+            "fieldName": "tools",
+            "id": "CrewAIAgentComponent-AAk3k",
+            "inputTypes": [
+              "Tool"
+            ],
+            "type": "other"
+          }
+        },
+        "selected": false,
+        "className": ""
+      },
+      {
+        "source": "SequentialCrewComponent-bnnWr",
+        "target": "ChatOutput-bRclp",
+        "sourceHandle": "{œdataTypeœ:œSequentialCrewComponentœ,œidœ:œSequentialCrewComponent-bnnWrœ,œnameœ:œoutputœ,œoutput_typesœ:[œMessageœ]}",
+        "targetHandle": "{œfieldNameœ:œinput_valueœ,œidœ:œChatOutput-bRclpœ,œinputTypesœ:[œDataœ,œDataFrameœ,œMessageœ],œtypeœ:œotherœ}",
+        "id": "reactflow__edge-SequentialCrewComponent-bnnWr{œdataTypeœ:œSequentialCrewComponentœ,œidœ:œSequentialCrewComponent-bnnWrœ,œnameœ:œoutputœ,œoutput_typesœ:[œMessageœ]}-ChatOutput-bRclp{œfieldNameœ:œinput_valueœ,œidœ:œChatOutput-bRclpœ,œinputTypesœ:[œDataœ,œDataFrameœ,œMessageœ],œtypeœ:œotherœ}",
+        "data": {
+          "sourceHandle": {
+            "dataType": "SequentialCrewComponent",
+            "id": "SequentialCrewComponent-bnnWr",
+            "name": "output",
+            "output_types": [
+              "Message"
+            ]
+          },
+          "targetHandle": {
+            "fieldName": "input_value",
+            "id": "ChatOutput-bRclp",
+            "inputTypes": [
+              "Data",
+              "DataFrame",
+              "Message"
+            ],
+            "type": "other"
+          }
+        },
+        "selected": false,
+        "className": ""
+      },
+      {
+        "source": "SequentialTaskComponent-VPtWu",
+        "target": "SequentialTaskComponent-gxHtm",
+        "sourceHandle": "{œdataTypeœ:œSequentialTaskComponentœ,œidœ:œSequentialTaskComponent-VPtWuœ,œnameœ:œtask_outputœ,œoutput_typesœ:[œSequentialTaskœ]}",
+        "targetHandle": "{œfieldNameœ:œtaskœ,œidœ:œSequentialTaskComponent-gxHtmœ,œinputTypesœ:[œSequentialTaskœ],œtypeœ:œotherœ}",
+        "id": "reactflow__edge-SequentialTaskComponent-VPtWu{œdataTypeœ:œSequentialTaskComponentœ,œidœ:œSequentialTaskComponent-VPtWuœ,œnameœ:œtask_outputœ,œoutput_typesœ:[œSequentialTaskœ]}-SequentialTaskComponent-gxHtm{œfieldNameœ:œtaskœ,œidœ:œSequentialTaskComponent-gxHtmœ,œinputTypesœ:[œSequentialTaskœ],œtypeœ:œotherœ}",
+        "data": {
+          "sourceHandle": {
+            "dataType": "SequentialTaskComponent",
+            "id": "SequentialTaskComponent-VPtWu",
+            "name": "task_output",
+            "output_types": [
+              "SequentialTask"
+            ]
+          },
+          "targetHandle": {
+            "fieldName": "task",
+            "id": "SequentialTaskComponent-gxHtm",
+            "inputTypes": [
+              "SequentialTask"
+            ],
+            "type": "other"
+          }
+        },
+        "selected": false,
+        "className": ""
+      },
+      {
+        "source": "SequentialTaskComponent-gxHtm",
+        "target": "SequentialCrewComponent-bnnWr",
+        "sourceHandle": "{œdataTypeœ:œSequentialTaskComponentœ,œidœ:œSequentialTaskComponent-gxHtmœ,œnameœ:œtask_outputœ,œoutput_typesœ:[œSequentialTaskœ]}",
+        "targetHandle": "{œfieldNameœ:œtasksœ,œidœ:œSequentialCrewComponent-bnnWrœ,œinputTypesœ:[œSequentialTaskœ],œtypeœ:œotherœ}",
+        "id": "reactflow__edge-SequentialTaskComponent-gxHtm{œdataTypeœ:œSequentialTaskComponentœ,œidœ:œSequentialTaskComponent-gxHtmœ,œnameœ:œtask_outputœ,œoutput_typesœ:[œSequentialTaskœ]}-SequentialCrewComponent-bnnWr{œfieldNameœ:œtasksœ,œidœ:œSequentialCrewComponent-bnnWrœ,œinputTypesœ:[œSequentialTaskœ],œtypeœ:œotherœ}",
+        "data": {
+          "sourceHandle": {
+            "dataType": "SequentialTaskComponent",
+            "id": "SequentialTaskComponent-gxHtm",
+            "name": "task_output",
+            "output_types": [
+              "SequentialTask"
+            ]
+          },
+          "targetHandle": {
+            "fieldName": "tasks",
+            "id": "SequentialCrewComponent-bnnWr",
+            "inputTypes": [
+              "SequentialTask"
+            ],
+            "type": "other"
+          }
+        },
+        "selected": false,
+        "className": ""
+      },
+      {
+        "source": "OllamaModel-rcXS4",
+        "target": "CrewAIAgentComponent-Wng5w",
+        "sourceHandle": "{œdataTypeœ:œOllamaModelœ,œidœ:œOllamaModel-rcXS4œ,œnameœ:œmodel_outputœ,œoutput_typesœ:[œLanguageModelœ]}",
+        "targetHandle": "{œfieldNameœ:œllmœ,œidœ:œCrewAIAgentComponent-Wng5wœ,œinputTypesœ:[œLanguageModelœ],œtypeœ:œotherœ}",
+        "id": "reactflow__edge-OllamaModel-rcXS4{œdataTypeœ:œOllamaModelœ,œidœ:œOllamaModel-rcXS4œ,œnameœ:œmodel_outputœ,œoutput_typesœ:[œLanguageModelœ]}-CrewAIAgentComponent-Wng5w{œfieldNameœ:œllmœ,œidœ:œCrewAIAgentComponent-Wng5wœ,œinputTypesœ:[œLanguageModelœ],œtypeœ:œotherœ}",
+        "data": {
+          "sourceHandle": {
+            "dataType": "OllamaModel",
+            "id": "OllamaModel-rcXS4",
+            "name": "model_output",
+            "output_types": [
+              "LanguageModel"
+            ]
+          },
+          "targetHandle": {
+            "fieldName": "llm",
+            "id": "CrewAIAgentComponent-Wng5w",
+            "inputTypes": [
+              "LanguageModel"
+            ],
+            "type": "other"
+          }
+        },
+        "selected": false,
+        "className": ""
+      },
+      {
+        "source": "CrewAIAgentComponent-Wng5w",
+        "target": "SequentialTaskComponent-gxHtm",
+        "sourceHandle": "{œdataTypeœ:œCrewAIAgentComponentœ,œidœ:œCrewAIAgentComponent-Wng5wœ,œnameœ:œoutputœ,œoutput_typesœ:[œAgentœ]}",
+        "targetHandle": "{œfieldNameœ:œagentœ,œidœ:œSequentialTaskComponent-gxHtmœ,œinputTypesœ:[œAgentœ],œtypeœ:œotherœ}",
+        "id": "reactflow__edge-CrewAIAgentComponent-Wng5w{œdataTypeœ:œCrewAIAgentComponentœ,œidœ:œCrewAIAgentComponent-Wng5wœ,œnameœ:œoutputœ,œoutput_typesœ:[œAgentœ]}-SequentialTaskComponent-gxHtm{œfieldNameœ:œagentœ,œidœ:œSequentialTaskComponent-gxHtmœ,œinputTypesœ:[œAgentœ],œtypeœ:œotherœ}",
+        "data": {
+          "sourceHandle": {
+            "dataType": "CrewAIAgentComponent",
+            "id": "CrewAIAgentComponent-Wng5w",
+            "name": "output",
+            "output_types": [
+              "Agent"
+            ]
+          },
+          "targetHandle": {
+            "fieldName": "agent",
+            "id": "SequentialTaskComponent-gxHtm",
+            "inputTypes": [
+              "Agent"
+            ],
+            "type": "other"
+          }
+        },
+        "selected": false,
+        "className": ""
+      }
+    ],
+    "viewport": {
+      "x": 56.53319449527976,
+      "y": 171.36436559324613,
+      "zoom": 0.20443439824401882
+    }
+  },
+  "updated_at": "2025-03-16T08:22:33+00:00"
+}
